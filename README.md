@@ -6,12 +6,13 @@ written by Gian M N Benucci, PhD<br>
 email: *benucci@msu.edu*<br>
 August 22, 2022
 
-# **This pipeline project is a working progress... please be patience.**
-
 *This pipeline is based upon work supported by the Great Lakes Bioenergy Research Center, U.S. Department of Energy, Office of Science, Office of Biological and Environmental Research under award DE-SC0018409*
 
 > **_NOTE_**<br> 
 > This pipeline was born for running on the `HPCC` at Michigan State University which run the SLURM (Simple Linux Utility for Resource Management) job scheduler system. If you want to run this piepline in any other systems it will require modification of the main, as well as, the accessory scripts.
+
+#### To run this pipeline please just this repo
+#### `git clone git@github.com:Gian77/Cecilia.git`
 
 ### **Let's explore the settings in the `config.yaml` file**
 
