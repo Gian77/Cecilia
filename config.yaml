@@ -1,0 +1,59 @@
+#************************** Cecilia-test v.1.0 config file **************************#
+
+#********** MIT LICENSE - Copyright © 2022 Gian M.N. Benucci, Ph.D. **********#
+#*********************** email: benucci[at]msu[dot]edu ***********************#
+
+echo "===> Reading the config.yaml file"
+
+#************* ALL THE FIELDS BELOW MUST BE SELECTED BY THE USER *************#
+#=============================================================================#
+project_dir="/mnt/home/benucci/Cecilia"
+
+# Data files and mapping file (mapping needed only if demultiplex=yes)
+rawdata="/mnt/home/benucci/Cecilia/rawdata"
+
+# Databases
+euk_db="/mnt/research/ShadeLab/Benucci/databases/unite_euk21/sh_general_dynamic_euk_10052021_dev.fasta"
+bac_db="/mnt/research/ShadeLab/Benucci/databases/silva_db138/SILVA_138_SSURef_tax_silva_bact_arch.fasta"
+
+bonito_isolates="/mnt/home/benucci/CONSTAX_v2/isolates_bonitolab2021.fasta"
+phix_db="/mnt/research/ShadeLab/Benucci/databases/phix_index/my_phix"
+
+# These are the main Cecilia-test run-related parameters - very important!
+# For details about these parameters, refer to the README.md file.
+DNAmarker=ITS
+R1=no
+R2=yes
+assemble=no
+rename=yes
+stripleft=yes
+stripleft_bp=5
+max_Eerr=1.0
+test_length=yes
+cluster_otu=yes
+cluster_asv=no
+cluster_swarm=no
+train_db=no
+trainfiles_euk="/mnt/research/ShadeLab/Benucci/databases/unite_euk21/trainfiles_unite10052021"
+trainfiles_bac="/mnt/research/ShadeLab/Benucci/databases/silva_db138/trainfiles_silva138"
+constax_conf=0.7
+
+#Add the primers used in the library prep. Some are listed, but maybe you need to add.
+#fwd_primer="TATYGYTCTTNAACGAGGAATC" # amf fwd primer (Author here)
+#rev_primer="AACACTCGCAYAYATGYTAGA" # amf rev primer
+#rev_primer_RC="TCTARCATRTRTGCGAGTGTT" # amf rev compl
+
+#fwd_primer="CTTGGTCATTTAGAGGAAGTAA" # ITS1F fwd primer (Gardes & Bruns 1993)
+#rev_primer="TCCTCCGCTTATTGATATGC" # ITS4 rev primer (White et al. 1990)
+#rev_primer_RC="GCATATCAATAAGCGGAGGA" # ITS4 rev compl
+
+fwd_primer="CTTGGTCATTTAGAGGAAGTAA" # ITS1F fwd primer (White et al. 1990)
+rev_primer="GCTGCGTTCTTCATCGATGC" # ITS2 rev primer (White et al. 1990)
+rev_primer_RC="GCATCGATGAAGAACGCAGC" # ITS2 rev compl
+
+#fwd_primer="GTGCCAGCMGCCGCGGTAA" # 515F fwd primer (Parada et al., 2016 modified by Caporaso)
+#rev_primer="GGACTACHVGGGTWTCTAAT" # 806R rev primer (Apprill et al., 2015. modified by Caporaso)
+#rev_primer_RC="ATTAGAWACCCBDGTAGTCC" # 806R rev compl https://earthmicrobiome.org/protocols-and-standards/16s/
+
+#****************************** END OF USER INPUT **************************#
+#===========================================================================#

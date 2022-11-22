@@ -1,0 +1,68 @@
+#!/bin/bash -login
+
+#SBATCH --time=00:15:00
+#SBATCH --nodes=1-2
+#SBATCH --ntasks=1  
+#SBATCH --cpus-per-task=16
+#SBATCH --mem=64G
+#SBATCH --job-name 1fastqc
+
+cd ${SLURM_SUBMIT_DIR}
+cores=$SLURM_CPUS_PER_TASK
+RAM=$SLURM_MEM_PER_NODE
+
+echo -e "Cecilia v.1.0 - usearCh basEd ampliCon pIpeLine for Illumina dAta
+MIT LICENSE - Copyright © 2022 Gian M.N. Benucci, Ph.D.
+email: benucci[at]msu[dot]edu\n"
+
+source ../config.yaml
+
+echo -e "\n Running script: 02_qualityCheck-fastqc.sb \n"
+
+echo -e "\n========== Sub-directories ==========\n"
+if [ -d $project_dir/outputs/02_rawQuality_fqc/ ]; then
+	echo -e "\n Directory exist! I performed this step already. Exiting... \n"
+else
+	echo -e "mkdir $project_dir/outputs/02_rawQuality_fqc/"; mkdir $project_dir/outputs/02_rawQuality_fqc/
+	echo -e "cd $project_dir/rawdata"; cd $project_dir/rawdata
+
+	echo -e "\n========= Read quality with FastQC =========\n"
+	conda activate fastqc
+	echo -e "FastQC version: `fastqc --version`"
+
+	cat $project_dir/rawdata/*R1*.fastq > $project_dir/rawdata/R1_read.fastq
+	cat $project_dir/rawdata/*R2*.fastq > $project_dir/rawdata/R2_read.fastq
+
+	fastqc $project_dir/rawdata/R1_read.fastq $project_dir/rawdata/R2_read.fastq \
+		--threads $cores \
+		--outdir $project_dir/outputs/02_rawQuality_fqc/
+	
+	/mnt/research/rdp/public/thirdParty/usearch11.0.667_i86linux64 \
+		-fastq_eestats2 $project_dir/rawdata/R1_read.fastq \
+		-output /$project_dir/outputs/02_rawQuality_fqc/R1_eestats2.results \
+		-length_cutoffs 100,500,1
+
+	rm $project_dir/rawdata/R1_read.fastq
+	rm $project_dir/rawdata/R2_read.fastq
+	conda deactivate
+
+	echo -e "\n========== Counting raw reads ==========\n"
+	for file in *.fastq; do
+		echo "$file : `echo $(cat ${file} | wc -l)/4|bc`"
+	done > $project_dir/rawdata/raw.counts
+
+	mkdir -p $project_dir/outputs/02_rawQuality_fqc/fastq_info/
+
+	for file in *.fastq; do
+  	/mnt/research/rdp/public/thirdParty/usearch11.0.667_i86linux64 \
+		-fastx_info \
+		$file \
+		-output /$project_dir/outputs/02_rawQuality_fqc/fastq_info/${file//.fastq/.info}
+	done
+fi
+
+echo -e "\n========= Sbatch log =========\n"
+echo -e "\n Current directory: `pwd` \n"
+echo -e "\n `sacct -u benucci -j $SLURM_JOB_ID --format=JobID,JobName,Start,End,Elapsed,NCPUS,ReqMem` \n"
+scontrol show job $SLURM_JOB_ID
+mv $project_dir/code/slurm-$SLURM_JOB_ID* $project_dir/slurms/02_checkQuality_fqc.slurm

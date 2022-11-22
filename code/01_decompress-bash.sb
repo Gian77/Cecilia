@@ -1,0 +1,78 @@
+#!/bin/bash -login
+
+#SBATCH --time=00:05:00 
+#SBATCH --nodes=1       
+#SBATCH --ntasks=1 
+#SBATCH --cpus-per-task=16
+#SBATCH --mem=64G
+#SBATCH --job-name 0gunzip
+#SBATCH -A shade-cole-bonito
+
+cd ${SLURM_SUBMIT_DIR}
+cores=$SLURM_CPUS_PER_TASK
+RAM=$SLURM_MEM_PER_NODE
+
+echo -e "Cecilia v.1.0 - usearCh basEd ampliCon pIpeLine for Illumina dAta
+MIT LICENSE - Copyright © 2022 Gian M.N. Benucci, Ph.D.
+email: benucci[at]msu[dot]edu\n"
+
+source ../config.yaml
+
+echo -e "\n Running script: 01_decompress-bash.sb \n"
+
+echo -e "\n========== Generating project sub-directories ==========\n"
+echo -e "mkdir $project_dir/outputs/\n `mkdir -p $project_dir/outputs/`
+	  mkdir $project_dir/slurms/\n `mkdir -p $project_dir/slurms/`
+	  \n"
+
+echo "cd $project_dir/rawdata"; cd $project_dir/rawdata
+
+echo -e "\n========== Decompress files ==========\n"
+for file in *.fastq*; do
+	if [[ $file == *.fastq.bz2 ]]; then echo -e "\n========== ${file} files are in fastq.bz2 format... ==========\n"
+			if [[ -f ${file%.*} ]]; then
+				echo -e "\n========== ${file} fastq.bz2 was already decompressed before! Skipping... ==========\n"
+			else 
+				echo -e "\n========== ${file} fastq.bz2 uncompressing... ==========\n"
+				bzip2 -cd < $file > ${file//.bz2/}
+			fi
+	elif [[ $file == *.fastq.gz ]]; then echo -e "\n========== ${file} files are in fastq.gz format... ==========\n"
+			if [[ -f ${file%.*} ]]; then
+				echo -e "\n========== ${file} fastq.gz was already decompressed before! Skipping... ==========\n"
+			else 
+				echo -e "\n========== ${file} fastq.gz uncompressing... ==========\n"
+				gzip -cd < $file > ${file//.gz/} 
+			fi 
+	elif [[ $file == *.fastq.tar.gz ]]; then echo -e "\n========== ${file} files are in fastq.tar.gz format... ==========\n"
+			if [[ -f ${file%.*} ]]; then
+				echo -e "\n========== ${file} fastq.tar.gz was already decompressed before! Skipping... ==========\n"
+			else 
+				echo -e "\n========== ${file} fastq.tar.gz uncompressing... ==========\n"
+				tar -czxvf < $file > ${file//.tar.gz/}
+			fi
+	elif [[ $file == *.fastq ]]; then 
+		echo -e "\n========== ${file} reads are in FASTQ format, nothing to do! ====================\n"
+	else 
+		echo -e "\n========== ${file} format non supported, this will not end up well... ==========\n"
+	fi
+done
+
+echo -e "\n========== if contain 1.1 or 1.2, rename to standard R1 R2 format ==========\n"
+# Checks if the file has 1_1 or 1_2 before running
+for file in *1_1.fastq; do
+	[ -f "$file" ] || continue
+	mv "$file" "${file//1_1.fastq/R1.fastq}"		
+done
+
+for file in *1_2.fastq; do
+	[ -f "$file" ] || continue
+	mv "$file" "${file//1_2.fastq/R2.fastq}"	
+done
+
+echo -e "The rawdata directory contains: \n`ls -l $project_dir/rawdata/`\n"
+
+echo -e "\n========== Sbatch log ==========\n"
+echo -e "\n Current directory: `pwd` \n"
+echo -e "\n `sacct -u benucci -j $SLURM_JOB_ID --format=JobID,JobName,Start,End,Elapsed,NCPUS,ReqMem` \n"
+scontrol show job $SLURM_JOB_ID
+mv $project_dir/code/slurm-$SLURM_JOB_ID* $project_dir/slurms/01_decompress-bash.slurm

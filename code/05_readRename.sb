@@ -1,0 +1,70 @@
+#!/bin/bash -login
+
+#SBATCH --time=00:10:00
+#SBATCH --nodes=1
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=8
+#SBATCH --mem=32G
+#SBATCH --job-name 5rename
+#SBACTH -A shade-cole-bonito
+
+cd ${SLURM_SUBMIT_DIR}
+cores=$SLURM_CPUS_PER_TASK
+RAM=$SLURM_MEM_PER_NODE
+
+echo -e "Cecilia v.1.0 - usearCh basEd ampliCon pIpeLine for Illumina dAta
+MIT LICENSE - Copyright © 2022 Gian M.N. Benucci, Ph.D.
+email: benucci[at]msu[dot]edu\n"
+
+source ../config.yaml
+
+echo -e "\n Running script: 05_readRename.sb \n"
+
+echo -e "\n========== Sub-directories ==========\n"
+if [ -d $project_dir/outputs/05_readRenamed_bash/ ]; then
+	echo -e "\n Directory exist! I performed this step already. Exiting... \n"
+else	
+	echo "mkdir $project_dir/outputs/05_readRenamed_bash/"; mkdir $project_dir/outputs/05_readRenamed_bash/
+
+	echo -e "\n========== Getting the right source path... ==========\n"
+	if [[ "$assemble" == "yes" ]]
+		then
+			source_dir=$project_dir/outputs/04_readAssembly_pear/
+			echo -e "\n You files were assembled and I will rename now! \n"
+			echo -e "\n Files are in: \n $source_dir \n"
+			echo "cp $project_dir/outputs/04_readAssembly_pear/*assembled.fastq $project_dir/outputs/05_readRenamed_bash/" 
+			cp $project_dir/outputs/04_readAssembly_pear/*assembled.fastq \
+				$project_dir/outputs/05_readRenamed_bash/
+	else
+			source_dir=$project_dir/outputs/03_removePhix_bowtie2/
+			echo -e "\n You files were NOT assembled and, if already demultiplexed, I will rename R1 or R2 now! \n"
+			echo -e "\n Files are in: \n $source_dir \n"
+			echo "cp $project_dir/outputs/03_removePhix_bowtie2/*nophix.fastq $project_dir/outputs/05_readRenamed_bash/" 
+			cp $project_dir/outputs/03_removePhix_bowtie2/*nophix.fastq \
+				$project_dir/outputs/05_readRenamed_bash/
+	fi
+
+	echo "cd $project_dir/outputs/05_readRenamed_bash/"; cd $project_dir/outputs/05_readRenamed_bash/
+
+	echo -e "\n========== Rename files and reads... ==========\n"
+	ls *.fastq -v | cat -n | sed 's/     /Sample/' | sed 's/_nophix.fastq.assembled//' > samples.list # correcting to match raw read name 
+
+	ls *.fastq -v | cat -n | \
+		while read new file;
+		do mv -n "$file" "Sample$new.fastq";
+	done 
+
+	# Rename reads within each sample according to sample name. Grabbing first few
+	# characters of the fastq headers to be used for renaming.
+	str=$(head -n1 Sample1.fastq | awk '{print substr($0,1,6)}')
+
+	for file in Sample*.fastq; do
+		awk '/^'$str'/{print "@'${file//.fastq/}'." ++i; next}{print}' < $file > "${file//Sample/New_sample}";
+	done
+fi
+
+echo -e "\n========== Sbatch log ==========\n"
+echo -e "\n Current directory: `pwd` \n"
+echo -e "\n `sacct -u benucci -j $SLURM_JOB_ID --format=JobID,JobName,Start,End,Elapsed,NCPUS,ReqMem` \n"
+scontrol show job $SLURM_JOB_ID
+mv $project_dir/code/slurm-$SLURM_JOB_ID* $project_dir/slurms/05_readRenamed_bash.slurm
