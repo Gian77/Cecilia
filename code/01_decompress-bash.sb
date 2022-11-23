@@ -73,6 +73,6 @@ echo -e "The rawdata directory contains: \n`ls -l $project_dir/rawdata/`\n"
 
 echo -e "\n========== Sbatch log ==========\n"
 echo -e "\n Current directory: `pwd` \n"
-echo -e "\n `sacct -u benucci -j $SLURM_JOB_ID --format=JobID,JobName,Start,End,Elapsed,NCPUS,ReqMem` \n"
+echo -e "\n `sacct -u $MSUusername -j $SLURM_JOB_ID --format=JobID,JobName,Start,End,Elapsed,NCPUS,ReqMem` \n"
 scontrol show job $SLURM_JOB_ID
 mv $project_dir/code/slurm-$SLURM_JOB_ID* $project_dir/slurms/01_decompress-bash.slurm
