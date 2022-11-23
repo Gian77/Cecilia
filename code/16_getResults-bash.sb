@@ -81,6 +81,6 @@ tar -zcvf Cecilia-results_$(date +"%d-%m-%Y").tar.gz --remove-files Cecilia-resu
 
 echo -e "\n========= Sbatch log =========\n"
 echo -e "\n Current directory: `pwd` \n"
-echo -e "\n `sacct -u benucci -j $SLURM_JOB_ID --format=JobID,JobName,Start,End,Elapsed,NCPUS` \n"
+echo -e "\n `sacct -u $MSUusername -j $SLURM_JOB_ID --format=JobID,JobName,Start,End,Elapsed,NCPUS` \n"
 scontrol show job $SLURM_JOB_ID
 mv $project_dir/code/slurm-$SLURM_JOB_ID* $project_dir/slurms/16_getResults-bash.sb
