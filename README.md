@@ -13,7 +13,7 @@ August 22, 2022
 
 ### **Installation**
 
-To use GAAP-BP just clone the directory 
+To use Cecilia just clone the directory 
 ```
 git clone git@github.com:Gian77/Cecilia.git
 ```
