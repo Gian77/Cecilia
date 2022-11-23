@@ -8,29 +8,44 @@ August 22, 2022
 
 *This pipeline is based upon work supported by the Great Lakes Bioenergy Research Center, U.S. Department of Energy, Office of Science, Office of Biological and Environmental Research under award DE-SC0018409*
 
-> **_NOTE_**<br> 
-> This pipeline was born for running on the `HPCC` at Michigan State University which run the SLURM (Simple Linux Utility for Resource Management) job scheduler system. If you want to run this piepline in any other systems it will require modification of the main, as well as, the accessory scripts.
+> **_WARNING_**<br>
+> ### **This pipeline was born for running on the `HPCC` at Michigan State University which run the SLURM (Simple Linux Utility for Resource Management) job scheduler system. If you want to run this piepline in any other systems it will require modification of the main, as well as, the accessory scripts.**
 
-#### To run this pipeline please just this repo
-#### `git clone git@github.com:Gian77/Cecilia.git`
+### **Installation**
+
+To use GAAP-BP just clone the directory 
+```
+git clone git@github.com:Gian77/Cecilia.git
+```
+You will then need to 
+* Copy your raw reads file in the rawdata directory together with a md5sum file.
+* Install all the necessary tools through `conda` (please see the complete list of tools reported below).
+* Download the databases (please see below and the `config.yaml` file), and include the full paths into the config file.
+* Select all the **User options** (please see below).
 
 ### **Let's explore the settings in the `config.yaml` file**
 
 #### **Directories**
-```
-# Main project's directory.
-project_dir="/mnt/home/benucci/Cecilia"
 
-# Secondary project's directories.
-rawdata="/mnt/home/benucci/Cecilia/rawdata"
+The main project's directory is: `project_dir="/mnt/home/benucci/Cecilia`. Of course, you will need to adjust the path to your HPCC user name. 
 
-# Mapping file - needed only if demultiplex=yes, see below.
-mapping="/mnt/home/benucci/Cecilia/rawdata/mapping_16.txt"
-```
+> __Note__ <br> 
+> * This pipeline run using SLURM (please see bove). **Resourches of each individual job scripts present in the `/mnt/home/benucci/Cecilia/code/` directory MUST be adjusted to the amount of data you want to run for each pipeline run.** In particular the parameters below.
+> ```
+> #SBATCH --time=00:10:00
+> #SBATCH --nodes=1
+> #SBATCH --ntasks=1
+> #SBATCH --cpus-per-task=8
+> #SBATCH --mem=16G
+> ```
+> Data MUST be demultiplexed and all *R1* and *R2* read files copied in the `$project_dir/rawdata/` directory, alongside a `md5sum` checksum file names `md5.txt`.
+> * The individual scripts in the `code` directory include the buy-in node priority `#SBATCH -A shade-cole-bonito`. If you do not have access to those priority nodes please remove that line in the individual scripts.
+> * You can change the name of the `$project_dir`, but by default is going to be `Cecilia`. Subdirectories such as `outputs` and `slurms` are part of the workflow, and should be left as they are.
+> * Please check the config file for options. A few script are additional and are can be avoided to save time.
 
 #### **Databases**
 ```
-# Markers gene sequence databases in the general format.
+# Markers gene sequence databases in the general format. Find a good PATH for your databases.
 euk_db="/mnt/research/ShadeLab/Benucci/databases/unite_euk21/sh_general_dynamic_euk_10052021_dev.fasta"
 bac_db="/mnt/research/ShadeLab/Benucci/databases/silva_db138/SILVA_138_SSURef_tax_silva_bact_arch.fasta"
 
@@ -41,11 +56,10 @@ phix_db="/mnt/research/ShadeLab/Benucci/databases/phix_index/my_phix"
 This below is an example of parameter for a Cecilia run. Before you fill this up there are impotant things to consider:
 * Data must be previously demultiplexed. Usually 1 sample has 2 sequence files, forward (i.e. R1) and reverse (i.e. R2). 
 * All logical variables are case sensitive and must be `yes` or `no`.
-	* Other variables are numeric (or float) and can be decided by the user.
+* Other variables are numeric (or float) and can be decided by the user.
 * Values for `R1` and `R2` are always required when assembling the reads, otherwise you should specify which read you want to use, *just `R1` or `R2` but not both*. If you want to run the analysis for both reads then you wil run Cecilia twice. 
 * `ITS`, `18S` or `16S` are the allowed markers for now. However if you have 18S data you must have an eukaryotic database as the one form the [UNITE](https://unite.ut.ee/).
 * In `stripleft` you must specify the number of bp to strip (cut off) the reads.
-
 
 ```
 DNAmarker=16S
@@ -75,7 +89,7 @@ Most of the variables are are sefl explanatory, usually boolean, so they take tw
 
 
 #### **PCR primers.**
-Remember to uncommetn the primers that were used in your study, and if you have used a different set of primers, just add it to the `config.yaml` file.
+Remember to uncomment the primers that were used in your study, and if you have used a different set of primers, just add it to the `config.yaml` file.
 ```
 #fwd_primer="TATYGYTCTTNAACGAGGAATC" # amf fwd primer (Author here)
 #rev_primer="AACACTCGCAYAYATGYTAGA" # amf rev primer

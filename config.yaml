@@ -9,8 +9,8 @@ echo "===> Reading the config.yaml file"
 #=============================================================================#
 project_dir="/mnt/home/benucci/Cecilia"
 
-# Data files and mapping file (mapping needed only if demultiplex=yes)
-rawdata="/mnt/home/benucci/Cecilia/rawdata"
+# Change your MSUusername based on MSU ID 
+MSUusername="benucci"
 
 # Databases
 euk_db="/mnt/research/ShadeLab/Benucci/databases/unite_euk21/sh_general_dynamic_euk_10052021_dev.fasta"
