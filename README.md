@@ -15,7 +15,8 @@ August 22, 2022
 
 To use Cecilia just clone the directory 
 ```
-git clone git@github.com:Gian77/Cecilia.git
+git clone https://github.com/Gian77/Cecilia.git
+
 ```
 You will then need to 
 * Copy your raw reads file in the rawdata directory together with a md5sum file.
