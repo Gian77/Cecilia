@@ -6,7 +6,6 @@
 #SBATCH --cpus-per-task=16
 #SBATCH --mem=64G
 #SBATCH --job-name 0gunzip
-#SBATCH -A shade-cole-bonito
 
 cd ${SLURM_SUBMIT_DIR}
 cores=$SLURM_CPUS_PER_TASK
