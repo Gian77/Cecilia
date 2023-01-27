@@ -1,0 +1,51 @@
+name: swarm3
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  - _libgcc_mutex=0.1=conda_forge
+  - _openmp_mutex=4.5=2_gnu
+  - arpack=3.7.0=hdefa2d7_2
+  - bzip2=1.0.8=h7b6447c_0
+  - ca-certificates=2022.07.19=h06a4308_0
+  - glpk=4.65=h276157c_3
+  - gmp=6.2.1=h295c915_3
+  - icu=58.2=he6710b0_3
+  - ld_impl_linux-64=2.38=h1181459_1
+  - libblas=3.9.0=15_linux64_openblas
+  - libcblas=3.9.0=15_linux64_openblas
+  - libffi=3.3=he6710b0_2
+  - libgcc-ng=12.1.0=h8d9b700_16
+  - libgfortran-ng=11.2.0=h00389a5_1
+  - libgfortran5=11.2.0=h1234567_1
+  - libgomp=12.1.0=h8d9b700_16
+  - liblapack=3.9.0=15_linux64_openblas
+  - libopenblas=0.3.20=h043d6bf_1
+  - libstdcxx-ng=12.1.0=ha89aaad_16
+  - libuuid=1.0.3=h7f8727e_2
+  - libxml2=2.9.14=h74e7548_0
+  - metis=5.1.0=hf484d3e_4
+  - mpfr=4.1.0=h9202a9a_1
+  - ncurses=6.3=h5eee18b_3
+  - openssl=1.1.1q=h7f8727e_0
+  - python=3.10.4=h12debd9_0
+  - python-igraph=0.9.11=py310hb58d747_0
+  - python_abi=3.10=2_cp310
+  - readline=8.1.2=h7f8727e_1
+  - sqlite=3.39.2=h5082296_0
+  - suitesparse=5.10.1=h9e50725_1
+  - swarm=3.1.0=hc9558a2_0
+  - tbb=2021.5.0=hd09550d_0
+  - texttable=1.6.4=pyhd3eb1b0_0
+  - tk=8.6.12=h1ccaba5_0
+  - tzdata=2022c=h04d1e81_0
+  - wheel=0.37.1=pyhd3eb1b0_0
+  - xz=5.2.5=h7f8727e_1
+  - zlib=1.2.12=h5eee18b_3
+  - pip:
+    - certifi==2022.6.15
+    - igraph==0.9.11
+    - pip==22.1.2
+    - setuptools==63.4.1
+prefix: /mnt/home/benucci/anaconda2/envs/swarm3

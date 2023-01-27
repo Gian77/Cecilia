@@ -1,0 +1,13 @@
+name: seqtk
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  - _libgcc_mutex=0.1=main
+  - _openmp_mutex=4.5=1_gnu
+  - libgcc-ng=9.3.0=h5101ec6_17
+  - libgomp=9.3.0=h5101ec6_17
+  - seqtk=1.3=hed695b0_2
+  - zlib=1.2.12=h7f8727e_2
+prefix: /mnt/home/benucci/anaconda2/envs/seqtk

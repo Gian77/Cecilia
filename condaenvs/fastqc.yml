@@ -1,0 +1,24 @@
+name: fastqc
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  - _libgcc_mutex=0.1=main
+  - _openmp_mutex=4.5=1_gnu
+  - fastqc=0.11.9=hdfd78af_1
+  - font-ttf-dejavu-sans-mono=2.37=hd3eb1b0_0
+  - fontconfig=2.13.1=h6c09931_0
+  - freetype=2.11.0=h70c0345_0
+  - icu=58.2=he6710b0_3
+  - libgcc-ng=9.3.0=h5101ec6_17
+  - libgomp=9.3.0=h5101ec6_17
+  - libpng=1.6.37=hbc83047_0
+  - libstdcxx-ng=9.3.0=hd4cf53a_17
+  - libuuid=1.0.3=h7f8727e_2
+  - libxml2=2.9.12=h03d6c58_0
+  - openjdk=8.0.152=h7b6447c_3
+  - perl=5.26.2=h14c3975_0
+  - xz=5.2.5=h7f8727e_1
+  - zlib=1.2.12=h7f8727e_2
+prefix: /mnt/home/benucci/anaconda2/envs/fastqc

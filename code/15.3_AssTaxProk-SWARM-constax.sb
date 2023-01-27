@@ -23,7 +23,7 @@ echo "mkdir -p $project_dir/outputs/14_constax_bac"; mkdir -p $project_dir/outpu
 echo "cd $project_dir/outputs/11_clustered_otu_asv_usearch"; cd $project_dir/outputs/11_clustered_otu_asv_usearch
 
 echo -e " \n========== Train reference database ==========\n"
-conda activate CTAX2
+conda activate constax2
 #echo -e "CONSTAX version: `constax --version`"
 
 if [[ "$train_db" == "yes" ]]; then
@@ -31,7 +31,7 @@ if [[ "$train_db" == "yes" ]]; then
 		first_file=$(ls $project_dir/outputs/11_clustered_otu_asv_usearch/swarm*.fasta | head -1)
 		cat $first_file | awk "/^>/ {n++} n>2 {exit} {print}" >  $project_dir/outputs/14_constax_bac/train.fasta
 
-		/mnt/research/bonito_lab/CONSTAX_May2020/constax.sh \
+		constax \
 			--num_threads $cores \
 			--mem $RAM \
 			--db $bac_db \
@@ -40,7 +40,9 @@ if [[ "$train_db" == "yes" ]]; then
 			--trainfile $trainfiles_bac/ \
 			--blast \
 			--output /$project_dir/outputs/14_constax_bac/ \
-			--msu_hpcc
+			--sintax_path $SINTAX \
+			--rdp_path $RDP \
+			--constax_path $CONSTAX
 
 elif [[ "$train_db" == "no" ]]; then
 		echo -e "You reference database is already trained. Skipping!"
@@ -52,7 +54,7 @@ for file in swarm*.fasta; do
 	echo -e " \n========== Assigning taxonomy for $file ==========\n"
 	file_name=$( echo $file | cut -f 1 -d"." )
 	
-	/mnt/research/bonito_lab/CONSTAX_May2020/constax.sh \
+	constax \
 		--num_threads $cores \
 		--mem $RAM \
 		--db $bac_db \
@@ -68,7 +70,9 @@ for file in swarm*.fasta; do
 		--output /$project_dir/outputs/14_constax_bac/constax_${file_name}/ \
 		--conf $constax_conf \
 		--blast \
-		--msu_hpcc
+		--sintax_path $SINTAX \
+		--rdp_path $RDP \
+		--constax_path $CONSTAX
 done
 
 conda deactivate

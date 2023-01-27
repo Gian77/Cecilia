@@ -8,7 +8,7 @@ August 22, 2022
 
 *This pipeline is based upon work supported by the Great Lakes Bioenergy Research Center, U.S. Department of Energy, Office of Science, Office of Biological and Environmental Research under award DE-SC0018409*
 
-> **_WARNING_**<br>
+> __Warning__<br>
 > ### **This pipeline was born for running on the `HPCC` at Michigan State University which run the SLURM (Simple Linux Utility for Resource Management) job scheduler system. If you want to run this piepline in any other systems it will require modification of the main, as well as, the accessory scripts.**
 
 ### **Installation**
@@ -42,7 +42,8 @@ The main project's directory is: `project_dir="/mnt/home/benucci/Cecilia`. Of co
 > Data MUST be demultiplexed and all *R1* and *R2* read files copied in the `$project_dir/rawdata/` directory, alongside a `md5sum` checksum file names `md5.txt`.
 > * The individual scripts in the `code` directory include the buy-in node priority `#SBATCH -A shade-cole-bonito`. If you do not have access to those priority nodes please remove that line in the individual scripts.
 > * You can change the name of the `$project_dir`, but by default is going to be `Cecilia`. Subdirectories such as `outputs` and `slurms` are part of the workflow, and should be left as they are.
-> * Please check the config file for options. A few script are additional and are can be avoided to save time.
+> * Please check the config file for options. A few script are additional and are can be avoided to save time.<br>
+> * The directory called `condaenvs` contain all the `yml` files you can use to recreate the exat conda environment used to run constax2. To create a conda environment based on a recipe you can do: `conda env create -f environment-name.yml`<br>
 
 #### **Databases**
 ```
@@ -75,6 +76,14 @@ test_length=yes
 cluster_otu=yes
 cluster_asv=yes
 cluster_swarm=yes
+```
+
+Then you need set the constax2 parameters. You need to add the constax PATHs to make the tool to run correctly. 
+
+```
+SINTAX=/mnt/research/rdp/public/thirdParty/usearch11.0.667_i86linux64
+RDP=/mnt/home/benucci/anaconda2/envs/constax2/share/rdptools-2.0.3-1/classifier
+CONSTAX=/mnt/home/benucci/anaconda2/envs/constax2/opt/constax-2.0.19-0
 train_db=no
 trainfiles_euk="/mnt/research/ShadeLab/Benucci/databases/unite_euk21/trainfiles_unite10052021"
 trainfiles_bac="/mnt/research/ShadeLab/Benucci/databases/silva_db138/trainfiles_silva138"
