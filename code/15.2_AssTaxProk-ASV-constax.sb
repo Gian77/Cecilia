@@ -28,18 +28,21 @@ conda activate CTAX2
 
 if [[ "$train_db" == "yes" ]]; then
 		echo -e "Training the reference Database"
+
+		echo "mkdir -p $project_dir/outputs/14_constax_bac/db_training/"; mkdir -p $project_dir/outputs/14_constax_bac/db_training/
+
 		first_file=$(ls $project_dir/outputs/11_clustered_otu_asv_usearch/asv*.fasta | head -1)
-		cat $first_file | awk "/^>/ {n++} n>2 {exit} {print}" >  $project_dir/outputs/14_constax_bac/train.fasta
+		cat $first_file | awk "/^>/ {n++} n>2 {exit} {print}" >  $project_dir/outputs/14_constax_bac/db_training/train.fasta
 
 		constax \
 			--num_threads $cores \
 			--mem $RAM \
 			--db $bac_db \
-			--input $project_dir/outputs/14_constax_bac/train.fasta \
+			--input $project_dir/outputs/14_constax_bac/db_training/train.fasta \
 			--train \
 			--trainfile $trainfiles_bac/ \
 			--blast \
-			--output /$project_dir/outputs/14_constax_bac/ \
+			--output /$project_dir/outputs/14_constax_bac/db_training/ \
 			--sintax_path $SINTAX \
 			--rdp_path $RDP \
 			--constax_path $CONSTAX

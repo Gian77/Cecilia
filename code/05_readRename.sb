@@ -47,16 +47,17 @@ else
 	echo "cd $project_dir/outputs/05_readRenamed_bash/"; cd $project_dir/outputs/05_readRenamed_bash/
 
 	echo -e "\n========== Rename files and reads... ==========\n"
-	ls *.fastq -v | cat -n | sed 's/     /Sample/' | sed 's/_nophix.fastq.assembled//' > samples.list # correcting to match raw read name 
-
-	ls *.fastq -v | cat -n | \
-		while read new file;
-		do mv -n "$file" "Sample$new.fastq";
-	done 
+	ls *.fastq -v | cat -n | sed 's/ //g' | sed 's/^/Sample/' > samples.list
+	
+	while read line; do 
+		new_name=$(echo $line | awk '{print $1}');
+		old_name=$(echo $line | awk '{print $2}');
+		mv "$old_name" "$new_name".fastq; 
+	done <samples.list
 
 	# Rename reads within each sample according to sample name. Grabbing first few
 	# characters of the fastq headers to be used for renaming.
-	str=$(head -n1 Sample1.fastq | awk '{print substr($0,1,6)}')
+	str=$(head -n1 Sample1.fastq | awk '{print substr($0,1,3)}')
 
 	for file in Sample*.fastq; do
 		awk '/^'$str'/{print "@'${file//.fastq/}'." ++i; next}{print}' < $file > "${file//Sample/New_sample}";
