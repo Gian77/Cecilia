@@ -1,3 +1,7 @@
-#Files and dir in the rawdata/
+#Files and dir NOT tracked
 
-#rawdata/*fastq.gz
+rawdata/*.fastq.gz
+rawdata/*.fastq
+rawdata/*.txt
+outputs/
+slurms/
