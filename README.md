@@ -2,11 +2,12 @@
 
 ## *Cecilia v.1.0* - usear**C**h bas**E**d ampli**C**on p**I**pe**L**ine for **I**llumina d**A**ta<br> 
 <br>
+
+![Cecilia](images/cecilia.png)
+
 written by Gian M N Benucci, PhD<br>
 email: *benucci@msu.edu*<br>
 August 22, 2022
-
-![Cecilia](images/cecilia.png)
 
 *This pipeline is based upon work supported by the Great Lakes Bioenergy Research Center, U.S. Department of Energy, Office of Science, Office of Biological and Environmental Research under award DE-SC0018409*
 
