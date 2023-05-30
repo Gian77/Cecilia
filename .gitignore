@@ -1,6 +1,7 @@
 #Files and dir NOT tracked
 
 code/slurm-*.out
+rawdata/test_data/
 rawdata/*.fastq.gz
 rawdata/*.fastq
 rawdata/*.txt
