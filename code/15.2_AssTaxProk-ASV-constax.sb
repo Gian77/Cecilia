@@ -23,7 +23,7 @@ echo "mkdir -p $project_dir/outputs/14_constax_bac/"; mkdir -p $project_dir/outp
 echo "cd $project_dir/outputs/11_clustered_otu_asv_usearch/"; cd $project_dir/outputs/11_clustered_otu_asv_usearch/
 
 echo -e " \n========== Train reference database ==========\n"
-conda activate CTAX2
+conda activate constax2
 #echo -e "CONSTAX version: `constax --version`"
 
 if [[ "$train_db" == "yes" ]]; then

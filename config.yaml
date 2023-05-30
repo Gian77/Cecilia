@@ -13,9 +13,9 @@ project_dir="/mnt/home/benucci/Cecilia"
 MSUusername="benucci"
 
 # Databases
-euk_db="/mnt/research/ShadeLab/Benucci/databases/unite_euk21/sh_general_dynamic_euk_10052021_dev.fasta"
-bac_db="/mnt/research/ShadeLab/Benucci/databases/silva_db138/SILVA_138_SSURef_tax_silva_bact_arch.fasta"
-bonito_isolates="/mnt/home/benucci/CONSTAX_v2/isolates_bonitolab2021.fasta"
+euk_db="/mnt/home/benucci/CONSTAX_taxonomy/dbs/UNITE/sh_general_release_dynamic_s_all_29.11.2022_dev.fasta"
+bac_db="/mnt/home/benucci/CONSTAX_taxonomy/dbs/SILVA/SILVA_138_SSURef_tax_silva_bact_arch.fasta"
+bonito_isolates="/mnt/home/benucci/CONSTAX_taxonomy/dbs/isolates_bonitolab2021.fasta"
 kevin_synt="/mnt/home/benucci/CONSTAX_taxonomy/dbs/synthetic_kevin.fasta"
 phix_db="/mnt/research/ShadeLab/Benucci/databases/phix_index/my_phix"
 
@@ -39,8 +39,8 @@ SINTAX=/mnt/research/rdp/public/thirdParty/usearch11.0.667_i86linux64
 RDP=/mnt/home/benucci/anaconda2/envs/constax2/share/rdptools-2.0.3-1/classifier
 CONSTAX=/mnt/home/benucci/anaconda2/envs/constax2/opt/constax-2.0.19-0
 train_db=no
-trainfiles_euk="/mnt/research/ShadeLab/Benucci/databases/unite_euk21/trainfiles_unite10052021"
-trainfiles_bac="/mnt/research/ShadeLab/Benucci/databases/silva_db138/trainfiles_silva138"
+trainfiles_euk="/mnt/home/benucci/CONSTAX_taxonomy/dbs/UNITE/trainfiles_unite29112022"
+trainfiles_bac="/mnt/home/benucci/CONSTAX_taxonomy/dbs/SILVA/trainfiles_silva138"
 constax_conf=0.7
 
 #Add the primers used in the library prep. Some are listed, but maybe you need to add.

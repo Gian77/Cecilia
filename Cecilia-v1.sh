@@ -58,7 +58,7 @@ echo "$jid1: For starting, I will decompress your raw reads files."
 jid2=`sbatch --dependency=afterok:$jid1 02_qualityCheck.sb | cut -d" " -f 4`
 echo "$jid2: I will check the quality and generate statistics."
 
-jid3=`sbatch --dependency=afterok:$jid1 03_removePhix-bowtie2.sb | cut -d" " -f 4`
+jid3=`sbatch --dependency=afterok:$jid1:$jid2 03_removePhix-bowtie2.sb | cut -d" " -f 4`
 echo "$jid3: I will remove Phix reads with bowtie2."
 
 # Assembling reads

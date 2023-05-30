@@ -53,14 +53,16 @@ else
 		new_name=$(echo $line | awk '{print $1}');
 		old_name=$(echo $line | awk '{print $2}');
 		mv "$old_name" "$new_name".fastq; 
-	done <samples.list
+	done < samples.list
 
-	# Rename reads within each sample according to sample name. Grabbing first few
-	# characters of the fastq headers to be used for renaming.
-	str=$(head -n1 Sample1.fastq | awk '{print substr($0,1,3)}')
+	# Rename reads within each sample according to sample name.
+	#/^@/ matches lines that start with "@" character, indicating the start of a new read. 
+	#`print "@"base_name"_"++count` prints the new read name by appending the base name and the incremented count. 
+	# next skips to the next line in the input file. 
+	#1 prints all other lines (sequence, quality, and optional lines) as is.
 
 	for file in Sample*.fastq; do
-		awk '/^'$str'/{print "@'${file//.fastq/}'." ++i; next}{print}' < $file > "${file//Sample/New_sample}";
+		awk '/^@/{print "@'${file//.fastq/}'."++count; next} 1' "$file" > "${file//Sample/New_sample}"
 	done
 fi
 
