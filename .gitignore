@@ -5,6 +5,7 @@ rawdata/test_data/
 rawdata/*.fastq.gz
 rawdata/*.fastq
 rawdata/*.txt
+rawdata/md5.txt
 rawdata/raw.counts
 outputs/
 slurms/
