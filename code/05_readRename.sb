@@ -49,21 +49,23 @@ else
 	echo -e "\n========== Rename files and reads... ==========\n"
 	ls *.fastq -v | cat -n | sed 's/ //g' | sed 's/^/Sample/' > samples.list
 	
-	while read line; do 
-		new_name=$(echo $line | awk '{print $1}');
-		old_name=$(echo $line | awk '{print $2}');
-		mv "$old_name" "$new_name".fastq; 
-	done < samples.list
+	sh readRename.sh $project_dir/outputs/05_readRenamed_bash/
 
-	# Rename reads within each sample according to sample name.
+	# I have a better solution now! To remove this later on
+	#while read line; do 
+	#	new_name=$(echo $line | awk '{print $1}');
+	#	old_name=$(echo $line | awk '{print $2}');
+	#	mv "$old_name" "$new_name".fastq; 
+	#done < samples.list
+
+	#Rename reads within each sample according to sample name.
 	#/^@/ matches lines that start with "@" character, indicating the start of a new read. 
 	#`print "@"base_name"_"++count` prints the new read name by appending the base name and the incremented count. 
 	# next skips to the next line in the input file. 
 	#1 prints all other lines (sequence, quality, and optional lines) as is.
-
-	for file in Sample*.fastq; do
-		awk '/^@/{print "@'${file//.fastq/}'."++count; next} 1' "$file" > "${file//Sample/New_sample}"
-	done
+	#for file in Sample*.fastq; do
+	#	awk '/^@/{print "@'${file//.fastq/}'."++count; next} 1' "$file" > "${file//Sample/New_sample}"
+	#done
 fi
 
 echo -e "\n========== Sbatch log ==========\n"
