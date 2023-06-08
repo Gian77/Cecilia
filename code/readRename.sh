@@ -18,7 +18,7 @@ for file in "$fastq_directory"/*.fastq; do
         new_name="${sample_name}.fastq"
         
 	# Write old and new file names into the output file
-        echo "$(basename "$file") $new_name" >> "$output_file"
+        echo "$(basename "$file")\t$new_name" >> "$output_file"
 
         # Rename the file
         mv "$file" "$fastq_directory/$new_name"

@@ -47,7 +47,7 @@ else
 	echo "cd $project_dir/outputs/05_readRenamed_bash/"; cd $project_dir/outputs/05_readRenamed_bash/
 
 	echo -e "\n========== Rename files and reads... ==========\n"
-	ls *.fastq -v | cat -n | sed 's/ //g' | sed 's/^/Sample/' > samples.list
+	#ls *.fastq -v | cat -n | sed 's/ //g' | sed 's/^/Sample/' > samples.list
 	
 	sh $project_dir/code/readRename.sh $project_dir/outputs/05_readRenamed_bash/
 

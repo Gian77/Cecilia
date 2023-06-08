@@ -33,7 +33,7 @@ else
 			conda activate cutadapt
 			echo "cutadapt version: `cutadapt --version`"	
 
-			for file in New*.fastq; do
+			for file in sample*.fastq; do
 			cutadapt \
 				-j $cores \
 				-g $fwd_primer \
@@ -61,7 +61,7 @@ else
 			conda activate cutadapt
 			echo "cutadapt version: `cutadapt --version`"	
 
-			for file in New*.fastq; do
+			for file in sample*.fastq; do
 			cutadapt \
 				-j $cores \
 				-g $adapter \
