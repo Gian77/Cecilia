@@ -1,5 +1,12 @@
 #!/bin/bash
 
+# Copyright © 2023 Gian M.N. Benucci, Ph.D.
+# email: benucci@msu.edu URL: https://github.com/Gian77
+
+# Adapted form https://www.biostars.org/p/56088/
+# This script crename fastq files according to a $prefix name and also
+# all the reads in each file progressiveli from $count to N read in the file.
+
 fastq_directory=$1  # Specify the path to the directory containing the FASTQ files
 prefix="sample"  # Specify the desired prefix for the renamed files
 count=1  # Specify the starting number for the renaming sequence
