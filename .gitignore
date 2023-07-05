@@ -8,5 +8,6 @@ rawdata/*.txt
 rawdata/md5.txt
 rawdata/tested_md5.results
 rawdata/raw.counts
+rawdata/bowtie2.list
 outputs/
 slurms/

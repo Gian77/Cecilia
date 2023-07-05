@@ -19,68 +19,70 @@ email: benucci[at]msu[dot]edu\n"
 source ../config.yaml
 
 echo -e "\n========== Sub-directories ==========\n"
-echo "mkdir $project_dir/outputs/16_getResults_bash"; mkdir $project_dir/outputs/16_getResults_bash
+echo "mkdir "$project_dir"/outputs/16_getResults_bash"; mkdir "$project_dir"/outputs/16_getResults_bash
 
 echo -e "\n========== collecting Cecilia-results ==========\n"
-mkdir $project_dir/outputs/16_getResults_bash/Cecilia-results/
+mkdir "$project_dir"/outputs/16_getResults_bash/Cecilia-results/
 
-cp $project_dir/config.yaml $project_dir/outputs/16_getResults_bash/Cecilia-results/Cecilia_config.yaml
+cp "$project_dir"/config.yaml "$project_dir"/outputs/16_getResults_bash/Cecilia-results/Cecilia_config.yaml
 
-cp $project_dir/rawdata/raw.counts $project_dir/outputs/16_getResults_bash/Cecilia-results/raw.counts
+cp "$project_dir"/rawdata/raw.counts "$project_dir"/outputs/16_getResults_bash/Cecilia-results/raw.counts
 
-[ -d $project_dir/outputs/02_rawQuality_fqc/ ] && \
-	cp -R $project_dir/outputs/02_rawQuality_fqc/ $project_dir/outputs/16_getResults_bash/Cecilia-results/rawQuality_stats/
+[ -d "$project_dir"/outputs/02_rawQuality_fqc/ ] && \
+	cp -R "$project_dir"/outputs/02_rawQuality_fqc/ "$project_dir"/outputs/16_getResults_bash/Cecilia-results/rawQuality_stats/
 
-[ -s $project_dir/outputs/03_removePhix_bowtie2/bowtie2.list ] && \
-	cp "$project_dir/outputs/03_removePhix_bowtie2/bowtie2.list" $project_dir/outputs/16_getResults_bash/Cecilia-results/bowtie2.list
-cp $project_dir/outputs/03_removePhix_bowtie2/nophix.counts  $project_dir/outputs/16_getResults_bash/Cecilia-results/nophix.counts
+[ -s "$project_dir"/outputs/03_removePhix_bowtie2/bowtie2.list ] && \
+	cp ""$project_dir"/outputs/03_removePhix_bowtie2/bowtie2.list" "$project_dir"/outputs/16_getResults_bash/Cecilia-results/bowtie2.list
+cp "$project_dir"/outputs/03_removePhix_bowtie2/nophix.counts  "$project_dir"/outputs/16_getResults_bash/Cecilia-results/nophix.counts
 
-cp $project_dir/outputs/05_readRenamed_bash/samples.list $project_dir/outputs/16_getResults_bash/Cecilia-results/renamed.list
+cp "$project_dir"/outputs/05_readRenamed_bash/file_mapping.txt "$project_dir"/outputs/16_getResults_bash/Cecilia-results/renamed_sample.list
 
-cp $project_dir/outputs/06_primerStrip_cutadapt/stripped.counts  $project_dir/outputs/16_getResults_bash/Cecilia-results/stripped.counts
-[ -s $project_dir/outputs/06_primerStrip_cutadapt/sequence_quality_nomatch.counts ] && \
-	cp $project_dir/outputs/06_primerStrip_cutadapt/sequence_quality_nomatch.counts $project_dir/outputs/16_getResults_bash/Cecilia-results/sequence_quality_nomatch.counts
-cp $project_dir/outputs/06_primerStrip_cutadapt/subset_500.fasta $project_dir/outputs/16_getResults_bash/Cecilia-results/subset_500.fasta
+cp "$project_dir"/outputs/06_primerStrip_cutadapt/stripped.counts  "$project_dir"/outputs/16_getResults_bash/Cecilia-results/stripped.counts
+[ -s "$project_dir"/outputs/06_primerStrip_cutadapt/sequence_quality_nomatch.counts ] && \
+	cp "$project_dir"/outputs/06_primerStrip_cutadapt/sequence_quality_nomatch.counts "$project_dir"/outputs/16_getResults_bash/Cecilia-results/sequence_quality_nomatch.counts
+cp "$project_dir"/outputs/06_primerStrip_cutadapt/subset_500.fasta "$project_dir"/outputs/16_getResults_bash/Cecilia-results/subset_500.fasta
 
-cp $project_dir/outputs/07_readTrimDemux_usearch/eestats2.results $project_dir/outputs/16_getResults_bash/Cecilia-results/eestats2.results
+cp "$project_dir"/outputs/07_readTrimDemux_usearch/eestats2.results "$project_dir"/outputs/16_getResults_bash/Cecilia-results/eestats2.results
 
-[ -s $project_dir/outputs/08_testLength_usearch/testLength.results ] && \
-	cp $project_dir/outputs/08_testLength_usearch/testLength.results $project_dir/outputs/16_getResults_bash/Cecilia-results/testLength.results
+[ -s "$project_dir"/outputs/08_testLength_usearch/testLength.results ] && \
+	cp "$project_dir"/outputs/08_testLength_usearch/testLength.results "$project_dir"/outputs/16_getResults_bash/Cecilia-results/testLength.results
 
-[ -s $project_dir/outputs/08_testLength_usearch/bpLength-log2.pdf ] && \
-	cp $project_dir/outputs/08_testLength_usearch/bpLength-log2.pdf $project_dir/outputs/16_getResults_bash/Cecilia-results/bpLength-log2.pdf 
-[ -s $project_dir/outputs/08_testLength_usearch/bpLength.pdf ] && \
-	cp $project_dir/outputs/08_testLength_usearch/bpLength.pdf $project_dir/outputs/16_getResults_bash/Cecilia-results/bpLength.pdf
-[ -s $project_dir/outputs/08_testLength_usearch/bpLength-faceted.pdf ] && \
-	cp $project_dir/outputs/08_testLength_usearch/bpLength-faceted.pdf $project_dir/outputs/16_getResults_bash/Cecilia-results/bpLength-faceted.pdf
+[ -s "$project_dir"/outputs/08_testLength_usearch/bpLength-log2.pdf ] && \
+	cp "$project_dir"/outputs/08_testLength_usearch/bpLength-log2.pdf "$project_dir"/outputs/16_getResults_bash/Cecilia-results/bpLength-log2.pdf 
+[ -s "$project_dir"/outputs/08_testLength_usearch/bpLength.pdf ] && \
+	cp "$project_dir"/outputs/08_testLength_usearch/bpLength.pdf "$project_dir"/outputs/16_getResults_bash/Cecilia-results/bpLength.pdf
+[ -s "$project_dir"/outputs/08_testLength_usearch/bpLength-faceted.pdf ] && \
+	cp "$project_dir"/outputs/08_testLength_usearch/bpLength-faceted.pdf "$project_dir"/outputs/16_getResults_bash/Cecilia-results/bpLength-faceted.pdf
 
-cp $project_dir/outputs/09_filterMaxee_usearch/filtered_200bp_fastqc.html $project_dir/outputs/16_getResults_bash/Cecilia-results/filtered_200bp_fastqc.html
-cp $project_dir/outputs/09_filterMaxee_usearch/filtered_225bp_fastqc.html $project_dir/outputs/16_getResults_bash/Cecilia-results/filtered_225bp_fastqc.html
-cp $project_dir/outputs/09_filterMaxee_usearch/filtered_250bp_fastqc.html $project_dir/outputs/16_getResults_bash/Cecilia-results/filtered_250bp_fastqc.html
+cp "$project_dir"/outputs/09_filterMaxee_usearch/filtered_200bp_fastqc.html "$project_dir"/outputs/16_getResults_bash/Cecilia-results/filtered_200bp_fastqc.html
+cp "$project_dir"/outputs/09_filterMaxee_usearch/filtered_225bp_fastqc.html "$project_dir"/outputs/16_getResults_bash/Cecilia-results/filtered_225bp_fastqc.html
+cp "$project_dir"/outputs/09_filterMaxee_usearch/filtered_250bp_fastqc.html "$project_dir"/outputs/16_getResults_bash/Cecilia-results/filtered_250bp_fastqc.html
 
-cp $project_dir/outputs/11_clustered_otu_asv_usearch/* $project_dir/outputs/16_getResults_bash/Cecilia-results/
+cp "$project_dir"/outputs/11_clustered_otu_asv_usearch/* "$project_dir"/outputs/16_getResults_bash/Cecilia-results/
 
-cp -R $project_dir/outputs/14_constax_*/ $project_dir/outputs/16_getResults_bash/Cecilia-results/
-	mv $project_dir/outputs/16_getResults_bash/Cecilia-results/14_constax_*/ $project_dir/outputs/16_getResults_bash/Cecilia-results/constax/  
+cp -R "$project_dir"/outputs/14_constax_*/ "$project_dir"/outputs/16_getResults_bash/Cecilia-results/
+	mv "$project_dir"/outputs/16_getResults_bash/Cecilia-results/14_constax_*/ "$project_dir"/outputs/16_getResults_bash/Cecilia-results/constax/  
 
 # Compare run time with asked resourches
-cd $project_dir/slurms/
+cd "$project_dir"/slurms/
 for file in *.slurm
 	do paste <(tail -n33 $file | head -n1) <(tail -n24 $file | head -n1)
-done > $project_dir/outputs/16_getResults_bash/Cecilia-results/runtime.results
+done > "$project_dir"/outputs/16_getResults_bash/Cecilia-results/runtime.results
 
-cp -R $project_dir/slurms/ $project_dir/outputs/16_getResults_bash/Cecilia-results/slurms/
+cp -R "$project_dir"/slurms/ "$project_dir"/outputs/16_getResults_bash/Cecilia-results/slurms/
 
 echo -e "\n========== Collecting Cecilia-results ==========\n"
-cd $project_dir/outputs/16_getResults_bash/
+cd "$project_dir"/outputs/16_getResults_bash/
 
 echo -e "Compressed file will contain `ls  Cecilia-results/ | wc -l` files and directories" 
 
-mv $project_dir/outputs/16_getResults_bash/Cecilia-results/ $project_dir/outputs/16_getResults_bash/Cecilia-results_$(date +"%d-%m-%Y")
-tar -zcvf Cecilia-results_$(date +"%d-%m-%Y").tar.gz --remove-files Cecilia-results_$(date +"%d-%m-%Y")
+mv "$project_dir"/outputs/16_getResults_bash/Cecilia-results/ "$project_dir"/outputs/16_getResults_bash/Cecilia-results_$(date +"%d-%m-%Y")
+tar -zcvf Cecilia-results_$(date +"%d-%m-%Y").tar.gz Cecilia-results_$(date +"%d-%m-%Y")
+
+cp "$project_dir"/outputs/16_getResults_bash/Cecilia-results_$(date +"%d-%m-%Y").tar.gz "$project_dir"/Cecilia-results_$(date +"%d-%m-%Y").tar.gz
 
 echo -e "\n========= Sbatch log =========\n"
 echo -e "\n Current directory: `pwd` \n"
 echo -e "\n `sacct -u $MSUusername -j $SLURM_JOB_ID --format=JobID,JobName,Start,End,Elapsed,NCPUS` \n"
 scontrol show job $SLURM_JOB_ID
-mv $project_dir/code/slurm-$SLURM_JOB_ID* $project_dir/slurms/16_getResults-bash.sb
+mv "$project_dir"/code/slurm-$SLURM_JOB_ID* "$project_dir"/slurms/16_getResults-bash.sb
