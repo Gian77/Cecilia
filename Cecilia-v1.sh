@@ -39,7 +39,7 @@ if [[ -f "$md5" ]]; then
 				echo -e "\n Good news! Files are identical. \n"
 		else
 				echo -e "\n Oh oh! You are in trouble. Your files are different from those at the source! \n"
-				echo -e "\nSomething went wrong during files'download. Try again, please.\n"
+				echo -e "\nSomething went wrong during files download. Try again, please.\n"
 				exit
 		fi
 else
@@ -72,10 +72,10 @@ fi
 # Renaming reads 
 if [[ "$assemble" == "yes" ]] && [[ "$rename" == "yes" ]]; then
 		jid5=`sbatch --dependency=afterok:$jid4 05_readRename.sb | cut -d" " -f 4`
-		echo "$jid5: I will rename your reads using "Sample..." as basename."
+		echo "$jid5: I will rename your reads using "Sample..." as a basename."
 elif [[ "$assemble" == "no" ]] && [[ "$rename" == "yes" ]]; then 
 		jid5=`sbatch --dependency=afterok:$jid3 05_readRename.sb | cut -d" " -f 4`
-		echo "$jid5: I will rename your reads using "Sample..." as basename."
+		echo "$jid5: I will rename your reads using "Sample..." as a basename."
 elif [[ "$assemble" == "no" ]] && [[ "$rename" == "no" ]] || [[ "$assemble" == "yes" ]] && [[ "$rename" == "no" ]]; then 
 		echo -e "\n You chose NOT to rename the reads! I will use the original names. \n";
 fi
@@ -84,13 +84,13 @@ fi
 # Stripping primers and adapters
 if [[ "$assemble" == "no" ]] && [[ "$rename" == "no" ]]; then			
 		jid6=`sbatch --dependency=afterok:$jid3 06_primerStrip-cutadapt.sb | cut -d" " -f 4`
-		echo "$jid6: I will remove primers and adapters with cutadapt. A sebset of reads is generated for double checking." 
+		echo "$jid6: I will remove primers and adapters with cutadapt. A subset of reads is generated for double checking." 
 elif  [[ "$assemble" == "yes" ]] && [[ "$rename" == "no" ]]; then		
 		jid6=`sbatch --dependency=afterok:$jid4 06_primerStrip-cutadapt.sb | cut -d" " -f 4`
-		echo "$jid6: I will remove primers and adapters with cutadapt. A sebset of reads is generated for double checking." 
+		echo "$jid6: I will remove primers and adapters with cutadapt. A subset of reads is generated for double checking." 
 else		
 		jid6=`sbatch --dependency=afterok:$jid5 06_primerStrip-cutadapt.sb | cut -d" " -f 4`
-		echo "$jid6: I will remove primers and adapters with cutadapt. A sebset of reads is generated for double checking." 
+		echo "$jid6: I will remove primers and adapters with cutadapt. A subset of reads is generated for double checking." 
 fi
 
 jid7=`sbatch --dependency=afterok:$jid6 07_readTrimDemux-usearch.sb | cut -d" " -f 4`
@@ -156,11 +156,11 @@ echo -e "\n========== Assigning taxonomies ==========\n"
 if [[ "$cluster_otu" == "yes" ]] && [[ "$cluster_asv" == "yes" ]] && [[ "$cluster_swarm" == "yes" ]]; then
 	if [[ "$DNAmarker" == "ITS" ]] || [[ "$DNAmarker" == "18S" ]]; then	
 		jidC1=`sbatch --dependency=afterok:$jid11 14.1_AssTaxEuk-OTU-constax.sb | cut -d" " -f 4`
-		echo "$jidC1: I will assign taxonomy to OTU sequences using UNITE eukaryote database with CONSTAX."
+		echo "$jidC1: I will assign taxonomy to OTU sequences using the UNITE eukaryote database with CONSTAX."
 		jidC2=`sbatch --dependency=afterok:$jid12 14.2_AssTaxEuk-ASV-constax.sb | cut -d" " -f 4`
-		echo "$jidC2: I will assign taxonomy to ASV sequences using UNITE eukaryote database with CONSTAX."
+		echo "$jidC2: I will assign taxonomy to ASV sequences using the UNITE eukaryote database with CONSTAX."
 		jidC3=`sbatch --dependency=afterok:$jid13 14.3_AssTaxEuk-SWARM-constax.sb | cut -d" " -f 4`
-		echo "$jidC3: I will assign taxonomy to SWARMs representative sequences using UNITE eukaryote database with CONSTAX."
+		echo "$jidC3: I will assign taxonomy to SWARMs representative sequences using the UNITE eukaryote database with CONSTAX."
 	elif [[ "$DNAmarker" == "16S" ]]; then
 		jidC1=`sbatch --dependency=afterok:$jid11 15.1_AssTaxProk-OTU-constax.sb | cut -d" " -f 4`
 		echo "$jidC1: I will assign taxonomy to OTU sequences using SILVA prokaryotic database with CONSTAX."
@@ -172,9 +172,9 @@ if [[ "$cluster_otu" == "yes" ]] && [[ "$cluster_asv" == "yes" ]] && [[ "$cluste
 elif [[ "$cluster_otu" == "yes" ]] && [[ "$cluster_asv" == "no" ]] && [[ "$cluster_swarm" == "yes" ]]; then
 	if [[ "$DNAmarker" == "ITS" ]] || [[ "$DNAmarker" == "18S" ]]; then	
 		jidC1=`sbatch --dependency=afterok:$jid11 14.1_AssTaxEuk-OTU-constax.sb | cut -d" " -f 4`
-		echo "$jidC1: I will assign taxonomy to OTU sequences using UNITE eukaryote database with CONSTAX."
+		echo "$jidC1: I will assign taxonomy to OTU sequences using the UNITE eukaryote database with CONSTAX."
 		jidC3=`sbatch --dependency=afterok:$jid13 14.3_AssTaxEuk-SWARM-constax.sb | cut -d" " -f 4`
-		echo "$jidC3: I will assign taxonomy to SWARMs representative sequences using UNITE eukaryote database with CONSTAX."
+		echo "$jidC3: I will assign taxonomy to SWARMs representative sequences using the UNITE eukaryote database with CONSTAX."
 	elif [[ "$DNAmarker" == "16S" ]]; then
 		jidC1=`sbatch --dependency=afterok:$jid11 15.1_AssTaxProk-OTU-constax.sb | cut -d" " -f 4`
 		echo "$jidC1: I will assign taxonomy to OTU sequences using SILVA prokaryotic database with CONSTAX."
@@ -184,9 +184,9 @@ elif [[ "$cluster_otu" == "yes" ]] && [[ "$cluster_asv" == "no" ]] && [[ "$clust
 elif [[ "$cluster_otu" == "no" ]] && [[ "$cluster_asv" == "yes" ]] && [[ "$cluster_swarm" == "yes" ]]; then
 	if [[ "$DNAmarker" == "ITS" ]] || [[ "$DNAmarker" == "18S" ]]; then	
 		jidC2=`sbatch --dependency=afterok:$jid12 14.2_AssTaxEuk-ASV-constax.sb | cut -d" " -f 4`
-		echo "$jidC2: I will assign taxonomy to ASV sequences using UNITE eukaryote database with CONSTAX."
+		echo "$jidC2: I will assign taxonomy to ASV sequences using the UNITE eukaryote database with CONSTAX."
 		jidC3=`sbatch --dependency=afterok:$jid13 14.3_AssTaxEuk-SWARM-constax.sb | cut -d" " -f 4`
-		echo "$jidC3: I will assign taxonomy to SWARMs representative sequences using UNITE eukaryote database with CONSTAX."
+		echo "$jidC3: I will assign taxonomy to SWARMs representative sequences using the UNITE eukaryote database with CONSTAX."
 	elif [[ "$DNAmarker" == "16S" ]]; then
 		jidC2=`sbatch --dependency=afterok:$jid12 15.2_AssTaxProk-ASV-constax.sb | cut -d" " -f 4`
 		echo "$jidC2: I will assign taxonomy to ASV sequences using SILVA prokaryotic database with CONSTAX."
@@ -196,7 +196,7 @@ elif [[ "$cluster_otu" == "no" ]] && [[ "$cluster_asv" == "yes" ]] && [[ "$clust
 elif [[ "$cluster_otu" == "no" ]] && [[ "$cluster_asv" == "no" ]] && [[ "$cluster_swarm" == "yes" ]]; then
 	if [[ "$DNAmarker" == "ITS" ]] || [[ "$DNAmarker" == "18S" ]]; then	
 		jidC3=`sbatch --dependency=afterok:$jid13 14.3_AssTaxEuk-SWARM-constax.sb | cut -d" " -f 4`
-		echo "$jidC3: I will assign taxonomy to SWARMs representative sequences using UNITE eukaryote database with CONSTAX."
+		echo "$jidC3: I will assign taxonomy to SWARMs representative sequences using the UNITE eukaryote database with CONSTAX."
 	elif [[ "$DNAmarker" == "16S" ]]; then
 		jidC3=`sbatch --dependency=afterok:$jid13 15.3_AssTaxProk-SWARM-constax.sb | cut -d" " -f 4`
 		echo "$jidC3: I will assign taxonomy to SWARMs representative sequences using SILVA prokaryotic database with CONSTAX."
@@ -204,9 +204,9 @@ elif [[ "$cluster_otu" == "no" ]] && [[ "$cluster_asv" == "no" ]] && [[ "$cluste
 elif [[ "$cluster_otu" == "yes" ]] && [[ "$cluster_asv" == "yes" ]] && [[ "$cluster_swarm" == "no" ]]; then
 	if [[ "$DNAmarker" == "ITS" ]] || [[ "$DNAmarker" == "18S" ]]; then	
 		jidC1=`sbatch --dependency=afterok:$jid11 14.1_AssTaxEuk-OTU-constax.sb | cut -d" " -f 4`
-		echo "$jidC1: I will assign taxonomy to OTU sequences using UNITE eukaryote database with CONSTAX."
+		echo "$jidC1: I will assign taxonomy to OTU sequences using the UNITE eukaryote database with CONSTAX."
 		jidC2=`sbatch --dependency=afterok:$jid12 14.2_AssTaxEuk-ASV-constax.sb | cut -d" " -f 4`
-		echo "$jidC2: I will assign taxonomy to ASV sequences using UNITE eukaryote database with CONSTAX."
+		echo "$jidC2: I will assign taxonomy to ASV sequences using the UNITE eukaryote database with CONSTAX."
 	elif [[ "$DNAmarker" == "16S" ]]; then
 		jidC1=`sbatch --dependency=afterok:$jid11 15.1_AssTaxProk-OTU-constax.sb | cut -d" " -f 4`
 		echo "$jidC1: I will assign taxonomy to OTU sequences using SILVA prokaryotic database with CONSTAX."
@@ -262,7 +262,7 @@ elif [[ "$cluster_otu" == "yes" ]] && [[ "$cluster_asv" == "no" ]] && [[ "$clust
 		echo "$jidC4: This will be fast. I will organize all the results for you."
 fi
 
-echo -e "\n========== These below are the jsubmitted sabtch... ==========\n" 
+echo -e "\n========== These below are the submitted sabtch... ==========\n" 
 echo -e "\n `sq` \n"
 
 echo -e "\n========== 'This is the end, my friend'... Now, be patient, you have to wait a bit... ==========\n"
