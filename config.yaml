@@ -21,16 +21,16 @@ phix_db="/mnt/research/ShadeLab/Benucci/databases/phix_index/my_phix"
 
 # These are the main Cecilia-test run-related parameters - very important!
 # For details about these parameters, refer to the README.md file.
-DNAmarker=ITS
-R1=no
-R2=yes
+DNAmarker=16S
+R1=yes
+R2=no
 assemble=no
 rename=yes
-stripleft=yes
-stripleft_bp=35
+stripleft=no
+stripleft_bp=0
 max_Eerr=1.0
 test_length=yes
-user_length=180
+user_length=260
 cluster_otu=yes
 cluster_asv=yes
 cluster_swarm=no
@@ -49,17 +49,17 @@ constax_conf=0.7
 #rev_primer="AACACTCGCAYAYATGYTAGA" # amf rev primer
 #rev_primer_RC="TCTARCATRTRTGCGAGTGTT" # amf rev compl
 
-fwd_primer="CTTGGTCATTTAGAGGAAGTAA" # ITS1F fwd primer (Gardes & Bruns 1993)
-rev_primer="TCCTCCGCTTATTGATATGC" # ITS4 rev primer (White et al. 1990)
-rev_primer_RC="GCATATCAATAAGCGGAGGA" # ITS4 rev compl
+#fwd_primer="CTTGGTCATTTAGAGGAAGTAA" # ITS1F fwd primer (Gardes & Bruns 1993)
+#rev_primer="TCCTCCGCTTATTGATATGC" # ITS4 rev primer (White et al. 1990)
+#rev_primer_RC="GCATATCAATAAGCGGAGGA" # ITS4 rev compl
 
 #fwd_primer="CTTGGTCATTTAGAGGAAGTAA" # ITS1F fwd primer (White et al. 1990)
 #rev_primer="GCTGCGTTCTTCATCGATGC" # ITS2 rev primer (White et al. 1990)
 #rev_primer_RC="GCATCGATGAAGAACGCAGC" # ITS2 rev compl
 
-#fwd_primer="GTGCCAGCMGCCGCGGTAA" # 515F fwd primer (Parada et al., 2016 modified by Caporaso)
-#rev_primer="GGACTACHVGGGTWTCTAAT" # 806R rev primer (Apprill et al., 2015. modified by Caporaso)
-#rev_primer_RC="ATTAGAWACCCBDGTAGTCC" # 806R rev compl https://earthmicrobiome.org/protocols-and-standards/16s/
+fwd_primer="GTGCCAGCMGCCGCGGTAA" # 515F fwd primer (Parada et al., 2016 modified by Caporaso)
+rev_primer="GGACTACHVGGGTWTCTAAT" # 806R rev primer (Apprill et al., 2015. modified by Caporaso)
+rev_primer_RC="ATTAGAWACCCBDGTAGTCC" # 806R rev compl https://earthmicrobiome.org/protocols-and-standards/16s/
 
 #****************************** END OF USER INPUT **************************#
 #===========================================================================#
