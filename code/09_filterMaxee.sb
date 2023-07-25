@@ -81,6 +81,7 @@ else
 		$project_dir/outputs/09_filterMaxee_usearch/filtered_200bp.fastq \
 		$project_dir/outputs/09_filterMaxee_usearch/filtered_225bp.fastq \
 		$project_dir/outputs/09_filterMaxee_usearch/filtered_250bp.fastq \
+		$project_dir/outputs/09_filterMaxee_usearch/filtered_"$user_length"bp.fastq \
 		--threads $cores \
 		--outdir $project_dir/outputs/09_filterMaxee_usearch/
 

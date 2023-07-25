@@ -1,10 +1,10 @@
 #!/bin/bash -login
 
-#SBATCH --time=03:59:00
-#SBATCH --nodes=1-2
+#SBATCH --time=012:00:00
+#SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=16
-#SBATCH --mem=32G
+#SBATCH --mem=48G
 #SBATCH --job-name 8testlength
 #SBACTH -A shade-cole-bonito
 
