@@ -23,14 +23,14 @@ phix_db="/mnt/research/ShadeLab/Benucci/databases/phix_index/my_phix"
 # For details about these parameters, refer to the README.md file.
 DNAmarker=16S
 R1=yes
-R2=no
-assemble=no
+R2=yes
+assemble=yes
 rename=yes
 stripleft=no
 stripleft_bp=0
 max_Eerr=1.0
 test_length=yes
-user_length=260
+user_length=280
 cluster_otu=yes
 cluster_asv=yes
 cluster_swarm=no
