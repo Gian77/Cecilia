@@ -83,13 +83,13 @@ echo "cd $project_dir/outputs/03_removePhix_bowtie2/"; cd $project_dir/outputs/0
 for file in *nophix.1.fastq
 do 
     [ -f "$file" ] || continue
-	mv "$file" "${file//R1_nophix.1.fastq/R1_nophix.fastq}"
+	mv "$file" "${file//R1*nophix.1.fastq/R1_nophix.fastq}"
 done 
 
 for file in *nophix.2.fastq
 do 
     [ -f "$file" ] || continue
-	mv "$file" "${file//R1_nophix.2.fastq/R2_nophix.fastq}"
+	mv "$file" "${file//R1*nophix.2.fastq/R2_nophix.fastq}"
 done 
 
 echo -e "\n========== Counting filtered reads ==========\n"
