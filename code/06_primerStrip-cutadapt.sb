@@ -146,20 +146,75 @@ else
 
 		echo -e "\n PCR primers are NOT present in the reads... Skipping! \n"
 
-		cat $project_dir/outputs/05_readRenamed_bash/sample* > $project_dir/outputs/06_primerStrip_cutadapt/pooled.fastq
 
-		conda activate seqtk 
-		seqtk sample -s100 $project_dir/outputs/06_primerStrip_cutadapt/pooled.fastq 500 > \
-					$project_dir/outputs/06_primerStrip_cutadapt/subset_500.fastq
-		seqtk seq -aQ64 $project_dir/outputs/06_primerStrip_cutadapt/subset_500.fastq > \
-					$project_dir/outputs/06_primerStrip_cutadapt/subset_500.fasta
-		conda deactivate
+		if [[ "$assemble" == "yes" ]] && [[ "$rename" == "yes" ]]; then
 
-		echo -e "\n========== Count renamed reads... ==========\n"
-		for fastq in $project_dir/outputs/05_readRenamed_bash/sample*; do 
-			echo "$fastq : `grep -c "^+$" $fastq`" 
-		done > $project_dir/outputs/06_primerStrip_cutadapt/stripped.counts
+			source_dir=$project_dir/outputs/05_readRenamed_bash/
+			cat $source_dir/sample* > $project_dir/outputs/06_primerStrip_cutadapt/pooled.fastq
 
+			conda activate seqtk 
+			seqtk sample -s100 $project_dir/outputs/06_primerStrip_cutadapt/pooled.fastq 500 > \
+						$project_dir/outputs/06_primerStrip_cutadapt/subset_500.fastq
+			seqtk seq -aQ64 $project_dir/outputs/06_primerStrip_cutadapt/subset_500.fastq > \
+						$project_dir/outputs/06_primerStrip_cutadapt/subset_500.fasta
+			conda deactivate
+
+			echo -e "\n========== Count renamed reads... ==========\n"
+			for fastq in $source_dir/sample*; do 
+				echo "$fastq : `grep -c "^+$" $fastq`" 
+			done > $project_dir/outputs/06_primerStrip_cutadapt/stripped.counts
+
+		elif [[ "$assemble" == "no" ]] && [[ "$rename" == "yes" ]]; then
+
+			source_dir=$project_dir/outputs/05_readRenamed_bash/
+			cat $source_dir/sample* > $project_dir/outputs/06_primerStrip_cutadapt/pooled.fastq
+
+			conda activate seqtk 
+			seqtk sample -s100 $project_dir/outputs/06_primerStrip_cutadapt/pooled.fastq 500 > \
+						$project_dir/outputs/06_primerStrip_cutadapt/subset_500.fastq
+			seqtk seq -aQ64 $project_dir/outputs/06_primerStrip_cutadapt/subset_500.fastq > \
+						$project_dir/outputs/06_primerStrip_cutadapt/subset_500.fasta
+			conda deactivate
+
+			echo -e "\n========== Count renamed reads... ==========\n"
+			for fastq in $source_dir/sample*; do 
+				echo "$fastq : `grep -c "^+$" $fastq`" 
+			done > $project_dir/outputs/06_primerStrip_cutadapt/stripped.counts
+
+		elif [[ "$assemble" == "yes" ]] && [[ "$rename" == "no" ]]; then
+			
+			source_dir=$project_dir/outputs/04_readAssembly_pear/
+			cat $source_dir/*assembled.fastq > $project_dir/outputs/06_primerStrip_cutadapt/pooled.fastq
+
+			conda activate seqtk 
+			seqtk sample -s100 $project_dir/outputs/06_primerStrip_cutadapt/pooled.fastq 500 > \
+						$project_dir/outputs/06_primerStrip_cutadapt/subset_500.fastq
+			seqtk seq -aQ64 $project_dir/outputs/06_primerStrip_cutadapt/subset_500.fastq > \
+						$project_dir/outputs/06_primerStrip_cutadapt/subset_500.fasta
+			conda deactivate
+
+			echo -e "\n========== Count renamed reads... ==========\n"
+			for fastq in $source_dir/*assembled.fastq; do 
+				echo "$fastq : `grep -c "^+$" $fastq`" 
+			done > $project_dir/outputs/06_primerStrip_cutadapt/stripped.counts
+
+		elif [[ "$assemble" == "no" ]] && [[ "$rename" == "no" ]]; then
+
+			source_dir=$project_dir/outputs/03_removePhix_bowtie2/
+			cat $source_dir/*nophix.fastq > $project_dir/outputs/06_primerStrip_cutadapt/pooled.fastq
+
+			conda activate seqtk 
+			seqtk sample -s100 $project_dir/outputs/06_primerStrip_cutadapt/pooled.fastq 500 > \
+						$project_dir/outputs/06_primerStrip_cutadapt/subset_500.fastq
+			seqtk seq -aQ64 $project_dir/outputs/06_primerStrip_cutadapt/subset_500.fastq > \
+						$project_dir/outputs/06_primerStrip_cutadapt/subset_500.fasta
+			conda deactivate
+
+			echo -e "\n========== Count renamed reads... ==========\n"
+			for fastq in $source_dir/*nophix.fastq; do 
+				echo "$fastq : `grep -c "^+$" $fastq`" 
+			done > $project_dir/outputs/06_primerStrip_cutadapt/stripped.counts
+		fi
 	fi
 fi
 

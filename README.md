@@ -68,6 +68,7 @@ This below is an example of parameter for a Cecilia run. Before you fill this up
 
 ```
 DNAmarker=16S
+primers=yes
 R1=yes
 R2=yes
 assemble=yes
@@ -92,7 +93,7 @@ trainfiles_euk="/mnt/research/ShadeLab/Benucci/databases/unite_euk21/trainfiles_
 trainfiles_bac="/mnt/research/ShadeLab/Benucci/databases/silva_db138/trainfiles_silva138"
 constax_conf=0.7
 ```
-Most of the variables are are sefl explanatory, usually boolean, so they take two values `yes` or `no`. For example, the `R1` and `R2` variables are the forward and reverse read coming out from the Illumina machines. Others are numeric (i.e. float), for example the `max_Eerr` and the `constax_conf` variable which represent the maximim number of expected errors to use in [USEARCH]()https://www.drive5.com/usearch/) for filtering and the cutoff value to use in the taxonomy assignments in [CONSTAX2](https://github.com/liberjul/CONSTAXv2). Some take different strings, for example, the `DNAmarker` variable accepts 3 values, `ITS`, `18S`, or `16S`. This variable tells Cecilia what type of marker we have sequenced. Others represent the full paths to certaian directories or files. For example, the `trainfiles_bac` is where the CONSTAX2 reference database training files will be saved.
+Most of the variables are are sefl explanatory, usually boolean, so they take two values `yes` or `no`. For example, the `R1` and `R2` variables are the forward and reverse read coming out from the Illumina machines. Others are numeric (i.e. float), for example the `max_Eerr` and the `constax_conf` variable which represent the maximim number of expected errors to use in [USEARCH]()https://www.drive5.com/usearch/) for filtering and the cutoff value to use in the taxonomy assignments in [CONSTAX2](https://github.com/liberjul/CONSTAXv2). Some take different strings, for example, the `DNAmarker` variable accepts 3 values, `ITS`, `18S`, or `16S`. This variable tells Cecilia what type of marker we have sequenced. Others represent the full paths to certaian directories or files. For example, the `trainfiles_bac` is where the CONSTAX2 reference database training files will be saved. In some cases reads are already removed of the PCR primers and adapters, which extends further out from them, specify if primers are present with `primers`.
 
 > **_IMPORTANT NOTE_**<br>
 >Ceclia generates several files that are used for double checking the results, if all the processes performed as we expected, and if there is something we can improve by changing any of the parameters described above. In particular:
