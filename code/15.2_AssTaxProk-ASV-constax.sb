@@ -1,9 +1,9 @@
 #!/bin/bash -login
 
-#SBATCH --time=12:00:00 
-#SBATCH --nodes=1  
+#SBATCH --time=24:00:00 
+#SBATCH --nodes=1
 #SBATCH --ntasks=1 
-#SBATCH --cpus-per-task=32
+#SBATCH --cpus-per-task=16
 #SBATCH --mem=256G
 #SBATCH --job-name 152bacasv
 #SBACTH -A shade-cole-bonito
@@ -53,16 +53,14 @@ fi
 
 echo -e "\n Training files as below:\n `ls -l $trainfiles_bac/`\n"
 
-for file in asv*.fasta; do 
-	echo -e " \n========== Assigning taxonomy for $file ==========\n"
-	file_name=$( echo $file | cut -f 1 -d"." )
-	
+if [[ "$user_only" == "yes" ]]; then
+
 	constax \
 		--num_threads $cores \
 		--mem $RAM \
 		--db $bac_db \
 		--trainfile $trainfiles_bac/ \
-		--input $file \
+		--input otus_${user_length}bp.fasta \
 		--isolates $bonito_isolates \
 		--isolates_query_coverage=90 \
 		--isolates_percent_identity=90 \
@@ -76,7 +74,35 @@ for file in asv*.fasta; do
 		--sintax_path $SINTAX \
 		--rdp_path $RDP \
 		--constax_path $CONSTAX
-done
+
+elif [[ "$user_only" == "no" ]]; then
+
+	for file in asv*.fasta; do 
+		echo -e " \n========== Assigning taxonomy for $file ==========\n"
+		file_name=$( echo $file | cut -f 1 -d"." )
+		
+		constax \
+			--num_threads $cores \
+			--mem $RAM \
+			--db $bac_db \
+			--trainfile $trainfiles_bac/ \
+			--input $file \
+			--isolates $bonito_isolates \
+			--isolates_query_coverage=90 \
+			--isolates_percent_identity=90 \
+			--high_level_db $bac_db \
+			--high_level_query_coverage=60 \
+			--high_level_percent_identity=60 \
+			--tax /$project_dir/outputs/14_constax_bac/constax_${file_name}/ \
+			--output /$project_dir/outputs/14_constax_bac/constax_${file_name}/ \
+			--conf $constax_conf \
+			--blast \
+			--sintax_path $SINTAX \
+			--rdp_path $RDP \
+			--constax_path $CONSTAX
+	done
+
+fi
 
 conda deactivate
 

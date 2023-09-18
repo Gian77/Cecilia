@@ -31,6 +31,7 @@ stripleft=no
 stripleft_bp=0
 max_Eerr=1.0
 test_length=yes
+user_only=yes
 user_length=180
 cluster_otu=yes
 cluster_asv=yes

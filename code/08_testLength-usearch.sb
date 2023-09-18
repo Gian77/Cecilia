@@ -1,10 +1,10 @@
 #!/bin/bash -login
 
-#SBATCH --time=012:00:00
+#SBATCH --time=014:00:00
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
-#SBATCH --cpus-per-task=16
-#SBATCH --mem=48G
+#SBATCH --cpus-per-task=32
+#SBATCH --mem=64G
 #SBATCH --job-name 8testlength
 #SBACTH -A shade-cole-bonito
 
@@ -86,7 +86,7 @@ else
 	Rscript $project_dir/code/testLength.R
 	conda deactivate
 		
-	mv $project_dir/code/*.pdf $project_dir/outputs/08_testLength_usearch/
+	#mv $project_dir/code/*.pdf $project_dir/outputs/08_testLength_usearch/
 fi
 
 echo -e "\n========= Sbatch log =========\n"
