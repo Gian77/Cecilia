@@ -1,0 +1,14 @@
+name: pear
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  - _libgcc_mutex=0.1=main
+  - _openmp_mutex=4.5=1_gnu
+  - bzip2=1.0.8=h7b6447c_0
+  - libgcc-ng=9.3.0=h5101ec6_17
+  - libgomp=9.3.0=h5101ec6_17
+  - pear=0.9.6=he4cf2ce_4
+  - zlib=1.2.12=h7f8727e_2
+prefix: /mnt/home/benucci/anaconda2/envs/pear
