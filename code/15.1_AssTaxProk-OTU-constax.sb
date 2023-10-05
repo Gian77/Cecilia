@@ -1,6 +1,6 @@
 #!/bin/bash -login
 
-#SBATCH --time=24:00:00
+#SBATCH --time=32:00:00
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=16
@@ -64,8 +64,8 @@ if [[ "$user_only" == "yes" ]]; then
 		--high_level_db $bac_db \
 		--high_level_query_coverage=60 \
 		--high_level_percent_identity=60 \
-		--tax /$project_dir/outputs/14_constax_bac/constax_${file_name}/ \
-		--output /$project_dir/outputs/14_constax_bac/constax_${file_name}/ \
+		--tax /$project_dir/outputs/14_constax_bac/constax_otus_${user_length}bp/ \
+		--output /$project_dir/outputs/14_constax_bac/constax_otus_${user_length}bp/ \
 		--conf $constax_conf \
 		--blast \
 		--sintax_path $SINTAX \
