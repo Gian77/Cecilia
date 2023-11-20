@@ -74,10 +74,10 @@ else
 
 		echo -e "$i" "\t" $filt "\t" $unique "\t" $otu >> $project_dir/outputs/08_testLength_usearch/testLength.results
 
-			#rm $project_dir/outputs/08_testLength_usearch/filtered_${i}.fastq
-			#rm $project_dir/outputs/08_testLength_usearch/uniques_${i}.fasta
-			#rm $project_dir/outputs/08_testLength_usearch/otus_${i}.fasta
-			#rm $project_dir/outputs/08_testLength_usearch/uparse_otus_${i}.txt
+			rm $project_dir/outputs/08_testLength_usearch/filtered_${i}.fastq
+			rm $project_dir/outputs/08_testLength_usearch/uniques_${i}.fasta
+			rm $project_dir/outputs/08_testLength_usearch/otus_${i}.fasta
+			rm $project_dir/outputs/08_testLength_usearch/uparse_otus_${i}.txt
 	done
 
 	echo -e "\n========= Plotting OTU number by each pb read length =========\n"
