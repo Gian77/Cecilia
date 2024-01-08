@@ -1,10 +1,10 @@
 #!/bin/bash -login
 
-#SBATCH --time=24:00:00 
+#SBATCH --time=48:00:00 
 #SBATCH --nodes=1
 #SBATCH --ntasks=1 
-#SBATCH --cpus-per-task=48
-#SBATCH --mem=128G
+#SBATCH --cpus-per-task=32
+#SBATCH --mem=256G
 #SBATCH --job-name 12asv
 
 cd ${SLURM_SUBMIT_DIR}
@@ -26,7 +26,6 @@ for file in unique*.fasta; do
 	file_name=$( echo $file | cut -f 2 -d"_" | cut -f 1 -d"." )
 
 	/mnt/research/rdp/public/thirdParty/usearch11.0.667_i86linux64 \
-		-threads $cores \
 		-unoise3 $file \
 		-tabbedout $project_dir/outputs/11_clustered_otu_asv_usearch/unoise_asv_${file_name}.txt \
 		-zotus $project_dir/outputs/11_clustered_otu_asv_usearch/asv_${file_name}.fasta

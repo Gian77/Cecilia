@@ -1,10 +1,10 @@
 #!/bin/bash -login
 
-#SBATCH --time=24:00:00 
+#SBATCH --time=48:00:00 
 #SBATCH --nodes=1
 #SBATCH --ntasks=1 
-#SBATCH --cpus-per-task=48
-#SBATCH --mem=128G
+#SBATCH --cpus-per-task=32
+#SBATCH --mem=256G
 #SBATCH --job-name 11otus
 
 cd ${SLURM_SUBMIT_DIR}
