@@ -43,7 +43,7 @@ else
 		-y $RAM \
 		-q 0 \
 		-p 0.001 \
-		-v 10 \
+		-v $min_overlap \
 		-u 0 \
 		-o $project_dir/outputs/04_readAssembly_pear/${R1//R1.fastq/}
 	done < $project_dir/outputs/03_removePhix_bowtie2/nophix.list

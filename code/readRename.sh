@@ -4,7 +4,7 @@
 # email: benucci@msu.edu URL: https://github.com/Gian77
 
 # This script crename fastq files according to a $prefix name and also
-# all the reads in each file progressiveli from $count to N read in the file.
+# all the reads in each file progressively from $count to N read in the file.
 
 fastq_directory=$1  # Specify the path to the directory containing the FASTQ files
 prefix="sample"  # Specify the desired prefix for the renamed files
