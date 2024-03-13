@@ -24,7 +24,7 @@ echo "mkdir "$project_dir"/outputs/16_getResults_bash"; mkdir "$project_dir"/out
 echo -e "\n========== collecting Cecilia-results ==========\n"
 mkdir "$project_dir"/outputs/16_getResults_bash/Cecilia-results/
 
-cp "$project_dir"/config.yaml "$project_dir"/outputs/16_getResults_bash/Cecilia-results/Cecilia_config.yaml
+cp "$project_dir"/config.yaml "$project_dir"/outputs/16_getResults_bash/Cecilia-results/config.yaml
 
 cp "$project_dir"/rawdata/raw.counts "$project_dir"/outputs/16_getResults_bash/Cecilia-results/raw.counts
 
@@ -57,6 +57,7 @@ cp "$project_dir"/outputs/07_readTrimDemux_usearch/eestats2.results "$project_di
 cp "$project_dir"/outputs/09_filterMaxee_usearch/filtered_200bp_fastqc.html "$project_dir"/outputs/16_getResults_bash/Cecilia-results/filtered_200bp_fastqc.html
 cp "$project_dir"/outputs/09_filterMaxee_usearch/filtered_225bp_fastqc.html "$project_dir"/outputs/16_getResults_bash/Cecilia-results/filtered_225bp_fastqc.html
 cp "$project_dir"/outputs/09_filterMaxee_usearch/filtered_250bp_fastqc.html "$project_dir"/outputs/16_getResults_bash/Cecilia-results/filtered_250bp_fastqc.html
+p "$project_dir"/outputs/09_filterMaxee_usearch/filtered_${user_length}bp_fastqc.html "$project_dir"/outputs/16_getResults_bash/Cecilia-results/filtered_${user_length}bp_fastqc.html
 
 cp "$project_dir"/outputs/11_clustered_otu_asv_usearch/* "$project_dir"/outputs/16_getResults_bash/Cecilia-results/
 

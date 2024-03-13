@@ -46,7 +46,7 @@ The main project's directory is: `project_dir="/mnt/home/benucci/Cecilia`. Of co
 > * The individual scripts in the `code` directory include the buy-in node priority `#SBATCH -A shade-cole-bonito`. If you do not have access to those priority nodes please remove that line in the individual scripts.
 > * You can change the name of the `$project_dir`, but by default is going to be `Cecilia`. Subdirectories such as `outputs` and `slurms` are part of the workflow, and should be left as they are.
 > * Please check the config file for options. A few script are additional and are can be avoided to save time.<br>
-> * The directory called `condaenvs` contain all the `yml` files you can use to recreate the exat conda environment used to run constax2. To create a conda environment based on a recipe you can do: `conda env create -f environment-name.yml`<br>
+> * The directory called `condaenvs` contain all the `yml` files you can use to recreate the exat conda environment used to run constax2. To create a conda environment based on a recipe you can do: `conda env create -f environment-name.yml`. The only environment needs to be created from scratch is the R environemt. Make sure you have the `r-tidyverse` package installed. <br>
 
 #### **Databases**
 ```

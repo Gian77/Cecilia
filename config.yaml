@@ -24,18 +24,18 @@ phix_db="/mnt/research/ShadeLab/Benucci/databases/phix_index/my_phix"
 DNAmarker=ITS
 primers=yes
 R1=yes
-R2=yes
-assemble=yes
+R2=no
+assemble=no
 min_overlap=50
 rename=yes
-stripleft=no
-stripleft_bp=0
+stripleft=yes
+stripleft_bp=100
 max_Eerr=1.0
 test_length=yes
-user_only=no
-user_length=300
+user_only=yes
+user_length=150
 cluster_otu=yes
-cluster_asv=yes
+cluster_asv=no
 cluster_swarm=no
 
 # constax2 parameters - very important!
