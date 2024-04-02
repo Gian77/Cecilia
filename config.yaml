@@ -16,26 +16,27 @@ MSUusername="benucci"
 euk_db="/mnt/home/benucci/CONSTAX_taxonomy/dbs/UNITE/sh_general_release_dynamic_s_all_29.11.2022_dev.fasta"
 bac_db="/mnt/home/benucci/CONSTAX_taxonomy/dbs/SILVA/SILVA_138_SSURef_tax_silva_bact_arch.fasta"
 bonito_isolates="/mnt/home/benucci/CONSTAX_taxonomy/dbs/isolates_bonitolab2021.fasta"
+SynCom="/mnt/home/benucci/CONSTAX_taxonomy/dbs/SynCom_N40.fasta"
 kevin_synt="/mnt/home/benucci/CONSTAX_taxonomy/dbs/synthetic_kevin.fasta"
 phix_db="/mnt/research/ShadeLab/Benucci/databases/phix_index/my_phix"
 
 # These are the main Cecilia-test run-related parameters - very important!
 # For details about these parameters, refer to the README.md file.
-DNAmarker=ITS
+DNAmarker=16S
 primers=yes
 R1=yes
 R2=no
 assemble=no
-min_overlap=50
+min_overlap=0
 rename=yes
-stripleft=yes
-stripleft_bp=100
+stripleft=no
+stripleft_bp=0
 max_Eerr=1.0
 test_length=yes
-user_only=yes
-user_length=150
+usrer_only=no
+user_length=230
 cluster_otu=yes
-cluster_asv=no
+cluster_asv=yes
 cluster_swarm=no
 
 # constax2 parameters - very important!
@@ -46,6 +47,7 @@ train_db=no
 trainfiles_euk="/mnt/home/benucci/CONSTAX_taxonomy/dbs/UNITE/trainfiles_unite29112022"
 trainfiles_bac="/mnt/home/benucci/CONSTAX_taxonomy/dbs/SILVA/trainfiles_silva138"
 constax_conf=0.7
+isolates_fasta=$SynCom
 
 #Add the primers used in the library prep. Some are listed, but maybe you need to add.
 #fwd_primer="TATYGYTCTTNAACGAGGAATC" # amf fwd primer (Author here)
@@ -60,9 +62,17 @@ constax_conf=0.7
 #rev_primer="GCTGCGTTCTTCATCGATGC" # ITS2 rev primer (White et al. 1990)
 #rev_primer_RC="GCATCGATGAAGAACGCAGC" # ITS2 rev compl
 
-fwd_primer="AACTTTYRRCAAYGGATCWCT" # 5.8S-FUN fwd primer (Taylor et al., 2016))
-rev_primer="AGCCTCCGCTTATTGATATGCTTAART" # ITS4-FUN rev primer (Taylor et al., 2016))
-rev_primer_RC="AYTTAAGCATATCAATAAGCGGAGGCT" # ITS4-FUN rev compl
+#fwd_primer="AACTTTYRRCAAYGGATCWCT" # 5.8S-FUN fwd primer (Taylor et al., 2016))
+#rev_primer="AGCCTCCGCTTATTGATATGCTTAART" # ITS4-FUN rev primer (Taylor et al., 2016))
+#rev_primer_RC="AYTTAAGCATATCAATAAGCGGAGGCT" # ITS4-FUN rev compl
+
+#fwd_primer="AGAGTTTGATCMTGGCTCAG" # 27F fwd primer (Heuer et al., Environ Microbiol. 1997;63:3233–41))
+#rev_primer="GGTTACCTTGTTACGACTT" # 1492R rev primer (Heuer et al., Environ Microbiol. 1997;63:3233–41)
+#rev_primer_RC="AAGTCGTAACAAGGTAACC" # 1492R rev compl
+
+fwd_primer="CCTACGGGNGGCWGCAG" # 341F fwd primer (Albersten et al., PLoS ONE. 2015;10:e0132783)
+rev_primer="GGACTACHVGGGTWTCTAAT" # 806R rev primer (Apprill et al., 2015. modified by Caporaso)
+rev_primer_RC="ATTAGAWACCCBDGTAGTCC" # 806R rev compl
 
 #fwd_primer="GTGCCAGCMGCCGCGGTAA" # 515F fwd primer (Parada et al., 2016 modified by Caporaso)
 #rev_primer="GGACTACHVGGGTWTCTAAT" # 806R rev primer (Apprill et al., 2015. modified by Caporaso)
@@ -70,3 +80,4 @@ rev_primer_RC="AYTTAAGCATATCAATAAGCGGAGGCT" # ITS4-FUN rev compl
 
 #****************************** END OF USER INPUT **************************#
 #===========================================================================#
+

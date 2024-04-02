@@ -54,16 +54,16 @@ The main project's directory is: `project_dir="/mnt/home/benucci/Cecilia`. Of co
 euk_db="/mnt/research/ShadeLab/Benucci/databases/unite_euk21/sh_general_dynamic_euk_10052021_dev.fasta"
 bac_db="/mnt/research/ShadeLab/Benucci/databases/silva_db138/SILVA_138_SSURef_tax_silva_bact_arch.fasta"
 
-bonito_isolates="/mnt/home/benucci/CONSTAX_v2/isolates_bonitolab2021.fasta"
+isolates_fasta="/mnt/home/benucci/CONSTAX_v2/isolates_bonitolab2021.fasta"
 phix_db="/mnt/research/ShadeLab/Benucci/databases/phix_index/my_phix"
 ```
 #### Cecilia run-related mandatory parameters
 This below is an example of parameter for a Cecilia run. Before you fill this up there are impotant things to consider:
-* Data must be previously demultiplexed. Usually 1 sample has 2 sequence files, forward (i.e. R1) and reverse (i.e. R2). 
+* Data must be previously demultiplexed. Usually 1 sample has 2 sequence files, forward (i.e. `R1`) and reverse (i.e. `R2`). 
 * All logical variables are case sensitive and must be `yes` or `no`.
 * Other variables are numeric (or float) and can be decided by the user.
 * Values for `R1` and `R2` are always required when assembling the reads, otherwise you should specify which read you want to use, *just `R1` or `R2` but not both*. If you want to run the analysis for both reads then you wil run Cecilia twice. 
-* `ITS`, `18S` or `16S` are the allowed markers for now. However if you have 18S data you must have an eukaryotic database as the one form the [UNITE](https://unite.ut.ee/).
+* `ITS`, `18S` or `16S` are the allowed markers for now. However if you have `18S` data you must have an eukaryotic database as the one form the [UNITE](https://unite.ut.ee/).
 * In `stripleft` you must specify the number of bp to strip (cut off) the reads.
 
 ```
@@ -96,7 +96,7 @@ trainfiles_euk="/mnt/research/ShadeLab/Benucci/databases/unite_euk21/trainfiles_
 trainfiles_bac="/mnt/research/ShadeLab/Benucci/databases/silva_db138/trainfiles_silva138"
 constax_conf=0.7
 ```
-Most of the variables are are sefl explanatory, usually boolean, so they take two values `yes` or `no`. For example, the `R1` and `R2` variables are the forward and reverse read coming out from the Illumina machines. Others are numeric (i.e. float), for example, `min_overlap`, `max_Eerr`, and `constax_conf`, which represent the minimum overlap size, the maximim number of expected errors to use in [USEARCH]()https://www.drive5.com/usearch/) for filtering, and the cutoff value to use in the taxonomy assignments in [CONSTAX2](https://github.com/liberjul/CONSTAXv2). Some take different strings, for example, the `DNAmarker` variable accepts 3 values, `ITS`, `18S`, or `16S`. This variable tells Cecilia what type of marker we have sequenced. Others represent the full paths to certaian directories or files. For example, the `trainfiles_bac` is where the CONSTAX2 reference database training files will be saved. In some cases reads are already removed of the PCR primers and adapters, which extends further out from them, specify if primers are present with `primers`.
+Most of the variables are are sefl explanatory, usually boolean, so they take two values `yes` or `no`. For example, the `R1` and `R2` variables are the forward and reverse read coming out from the Illumina machines. Others are numeric (i.e. float), for example, `min_overlap`, `max_Eerr`, and `constax_conf`, which represent the minimum overlap size, the maximim number of expected errors to use in [USEARCH]()https://www.drive5.com/usearch/) for filtering, and the cutoff value to use in the taxonomy assignments in [CONSTAX2](https://github.com/liberjul/CONSTAXv2). Some take different strings, for example, the `DNAmarker` variable accepts 3 values, `ITS`, `18S`, or `16S`. This variable tells Cecilia what type of marker we have sequenced. Others represent the full paths to certaian directories or files. For example, the `trainfiles_bac` is where the CONSTAX2 reference database training files will be saved. In some cases reads are already removed of the PCR primers and adapters, which extends further out from them, specify if primers are present with `primers`. The `isolates_fasta` is the path to the reference sequences of you isolates collection, if you have any. You can use this filed also to disentagle lab contaminants if, again, you have a fasta with DNA sequences of the target marker.
 
 > **_IMPORTANT NOTE_**<br>
 >Ceclia generates several files that are used for double checking the results, if all the processes performed as we expected, and if there is something we can improve by changing any of the parameters described above. In particular:
@@ -141,6 +141,7 @@ Please install via conda (or use the binaries in the HPPC) of all these software
 * ##### [SWARM](https://github.com/torognes/swarm)
 * ##### [CONSTAX2](https://constax.readthedocs.io/en/latest/)
 * ##### [seqtk](https://github.com/lh3/seqtk)
+* ##### [R](https://www.r-project.org/)
 
 > **_IMPORTANT NOTE_**<br> 
 >For [USEARCH](https://www.drive5.com/usearch/) or [VSEARCH](https://github.com/torognes/vsearch) you do not need a coda install, you can just download the binaries. At MSU we have multiple USEARCH licenses that were purchased and some belong to GLBRC. However, check if your lab is one of those that purchased the license befor eusing the tool. If so, USEARCH v11 in the MSU HPCC is at: `/mnt/research/rdp/public/thirdParty/usearch11.0.667_i86linux64`

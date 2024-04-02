@@ -3,10 +3,10 @@
 #SBATCH --time=32:00:00
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
-#SBATCH --cpus-per-task=16
+#SBATCH --cpus-per-task=32
 #SBATCH --mem=256G
-#SBATCH --job-name 141bacotu
-#SBACTH -A shade-cole-bonito
+#SBATCH --job-name 151bacotu
+#SBATCH -A shade-cole-bonito
 
 cd ${SLURM_SUBMIT_DIR}
 cores=$SLURM_CPUS_PER_TASK
@@ -23,13 +23,16 @@ echo "mkdir -p $project_dir/outputs/14_constax_bac/"; mkdir -p $project_dir/outp
 echo "cd $project_dir/outputs/11_clustered_otu_asv_usearch/"; cd $project_dir/outputs/11_clustered_otu_asv_usearch/
 
 echo -e " \n========== Train reference database ==========\n"
-conda activate constax2
-#echo -e "CONSTAX version: `constax --version`"
 
 if [[ "$train_db" == "yes" ]]; then
+
 		echo -e "Training the reference Database"
+		echo "mkdir -p $project_dir/outputs/14_constax_bac/db_training/"; mkdir -p $project_dir/outputs/14_constax_bac/db_training/
+
 		first_file=$(ls $project_dir/outputs/11_clustered_otu_asv_usearch/otus*.fasta | head -1)
 		cat $first_file | awk "/^>/ {n++} n>2 {exit} {print}" >  $project_dir/outputs/14_constax_bac/train.fasta
+
+		conda activate constax2
 
 		constax \
 			--num_threads $cores \
@@ -44,13 +47,18 @@ if [[ "$train_db" == "yes" ]]; then
 			--rdp_path $RDP \
 			--constax_path $CONSTAX
 
+		conda deactivate
+
 elif [[ "$train_db" == "no" ]]; then
+
 		echo -e "You reference database is already trained. Skipping!"
+		echo -e "\n Training files as below:\n `ls -l $trainfiles_bac/`\n"
+
 fi
 
-echo -e "\n Training files as below:\n `ls -l $trainfiles_bac/`\n"
-
 if [[ "$user_only" == "yes" ]]; then
+
+	conda activate constax2
 
 	constax \
 		--num_threads $cores \
@@ -58,7 +66,7 @@ if [[ "$user_only" == "yes" ]]; then
 		--db $bac_db \
 		--trainfile $trainfiles_bac/ \
 		--input otus_${user_length}bp.fasta \
-		--isolates $bonito_isolates \
+		--isolates $isolates_fasta \
 		--isolates_query_coverage=90 \
 		--isolates_percent_identity=90 \
 		--high_level_db $bac_db \
@@ -72,19 +80,24 @@ if [[ "$user_only" == "yes" ]]; then
 		--rdp_path $RDP \
 		--constax_path $CONSTAX
 
-elif [[ "$user_only" == "no" ]]; then
+	conda deactivate
+
+else
+
+	conda activate constax2
 
 	for file in otus*.fasta; do 
+
 		echo -e " \n========== Assigning taxonomy for $file ==========\n"
 		file_name=$( echo $file | cut -f 1 -d"." )
-		
+	
 		constax \
 			--num_threads $cores \
 			--mem $RAM \
 			--db $bac_db \
 			--trainfile $trainfiles_bac/ \
 			--input $file \
-			--isolates $bonito_isolates \
+			--isolates $isolates_fasta \
 			--isolates_query_coverage=90 \
 			--isolates_percent_identity=90 \
 			--high_level_db $bac_db \
@@ -99,8 +112,10 @@ elif [[ "$user_only" == "no" ]]; then
 			--constax_path $CONSTAX
 	done
 
+	conda deactivate
+
 fi
-conda deactivate
+
 
 echo -e "\n========= Sbatch log =========\n"
 echo -e "\n Current directory: `pwd` \n"
