@@ -26,7 +26,7 @@ for file in *.fasta; do
 	file_name=$( echo $file | cut -f 2 -d"_" | cut -f 1 -d"." )
 
 	/mnt/research/rdp/public/thirdParty/usearch11.0.667_i86linux64 \
-		-minsize 2 \
+		-minsize $otu_min_size \
 		-relabel OTU_ \
 		-cluster_otus $file \
 		-otus $project_dir/outputs/11_clustered_otu_asv_usearch/otus_${file_name}.fasta \

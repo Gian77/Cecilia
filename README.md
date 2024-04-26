@@ -67,21 +67,23 @@ This below is an example of parameter for a Cecilia run. Before you fill this up
 * In `stripleft` you must specify the number of bp to strip (cut off) the reads.
 
 ```
-DNAmarker=ITS
+DNAmarker=16S
 primers=yes
 R1=yes
-R2=yes
-assemble=yes
+R2=no
+assemble=no
 min_overlap=50
 rename=yes
 stripleft=no
 stripleft_bp=0
 max_Eerr=1.0
 test_length=yes
-user_only=no
-user_length=300
+usrer_only=no
+user_length=230
 cluster_otu=yes
+otu_min_size=2
 cluster_asv=yes
+zotu_min_size=4
 cluster_swarm=no
 ```
 
@@ -96,7 +98,7 @@ trainfiles_euk="/mnt/research/ShadeLab/Benucci/databases/unite_euk21/trainfiles_
 trainfiles_bac="/mnt/research/ShadeLab/Benucci/databases/silva_db138/trainfiles_silva138"
 constax_conf=0.7
 ```
-Most of the variables are are sefl explanatory, usually boolean, so they take two values `yes` or `no`. For example, the `R1` and `R2` variables are the forward and reverse read coming out from the Illumina machines. Others are numeric (i.e. float), for example, `min_overlap`, `max_Eerr`, and `constax_conf`, which represent the minimum overlap size, the maximim number of expected errors to use in [USEARCH]()https://www.drive5.com/usearch/) for filtering, and the cutoff value to use in the taxonomy assignments in [CONSTAX2](https://github.com/liberjul/CONSTAXv2). Some take different strings, for example, the `DNAmarker` variable accepts 3 values, `ITS`, `18S`, or `16S`. This variable tells Cecilia what type of marker we have sequenced. Others represent the full paths to certaian directories or files. For example, the `trainfiles_bac` is where the CONSTAX2 reference database training files will be saved. In some cases reads are already removed of the PCR primers and adapters, which extends further out from them, specify if primers are present with `primers`. The `isolates_fasta` is the path to the reference sequences of you isolates collection, if you have any. You can use this filed also to disentagle lab contaminants if, again, you have a fasta with DNA sequences of the target marker.
+Most of the variables are are sefl explanatory, usually boolean, so they take two values `yes` or `no`. For example, the `R1` and `R2` variables are the forward and reverse read coming out from the Illumina machines. Others are numeric (i.e. float), for example, `min_overlap`, `max_Eerr`, and `constax_conf`, which represent the minimum overlap size, the maximim number of expected errors to use in [USEARCH]()https://www.drive5.com/usearch/) for filtering, and the cutoff value to use in the taxonomy assignments in [CONSTAX2](https://github.com/liberjul/CONSTAXv2). Some take different strings, for example, the `DNAmarker` variable accepts 3 values, `ITS`, `18S`, or `16S`. This variable tells Cecilia what type of marker we have sequenced. Others represent the full paths to certaian directories or files. For example, the `trainfiles_bac` is where the CONSTAX2 reference database training files will be saved. In some cases reads are already removed of the PCR primers and adapters, which extends further out from them, specify if primers are present with `primers`. The `isolates_fasta` is the path to the reference sequences of you isolates collection, if you have any. You can use this filed also to disentagle lab contaminants if, again, you have a fasta with DNA sequences of the target marker. `otu_min_size` and `zotu_min_size` are the [-minsize](https://www.drive5.com/usearch/manual/cmd_unoise3.html) options that specifies the minimum abundance (size= annotation). For OTUs usually we remove singletones so otu_min_size=2. For Zotus default is 8, input sequences with lower abundances are discarded. In USEARCH documentation: "most of the low-abundance sequences are usually noisy and are be mapped to a ZOTU by the otutab command. For higher sensivity, reducing minsize to 4 is reasonable, especially if samples are denoised indivudually rather pooling all samples together, as I would usually recommend. With smaller minsize, there tends to be more errors in the predicted low-abundance biological sequences."
 
 > **_IMPORTANT NOTE_**<br>
 >Ceclia generates several files that are used for double checking the results, if all the processes performed as we expected, and if there is something we can improve by changing any of the parameters described above. In particular:

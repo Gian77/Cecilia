@@ -27,7 +27,7 @@ primers=yes
 R1=yes
 R2=no
 assemble=no
-min_overlap=0
+min_overlap=50
 rename=yes
 stripleft=no
 stripleft_bp=0
@@ -36,7 +36,9 @@ test_length=yes
 usrer_only=no
 user_length=230
 cluster_otu=yes
+otu_min_size=2
 cluster_asv=yes
+zotu_min_size=4
 cluster_swarm=no
 
 # constax2 parameters - very important!
@@ -70,7 +72,8 @@ isolates_fasta=$SynCom
 #rev_primer="GGTTACCTTGTTACGACTT" # 1492R rev primer (Heuer et al., Environ Microbiol. 1997;63:3233–41)
 #rev_primer_RC="AAGTCGTAACAAGGTAACC" # 1492R rev compl
 
-fwd_primer="CCTACGGGNGGCWGCAG" # 341F fwd primer (Albersten et al., PLoS ONE. 2015;10:e0132783)
+#fwd_primer="CCTACGGGNGGCWGCAG" CCTACGGGAGGCAGCAG# 341F fwd primer (Albersten et al., PLoS ONE. 2015;10:e0132783)
+fwd_primer="CCTACGGGAGGCAGCAG" # 341F fwd primer (Albersten et al., PLoS ONE. 2015;10:e0132783)
 rev_primer="GGACTACHVGGGTWTCTAAT" # 806R rev primer (Apprill et al., 2015. modified by Caporaso)
 rev_primer_RC="ATTAGAWACCCBDGTAGTCC" # 806R rev compl
 

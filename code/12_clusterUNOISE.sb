@@ -27,6 +27,7 @@ for file in unique*.fasta; do
 
 	/mnt/research/rdp/public/thirdParty/usearch11.0.667_i86linux64 \
 		-unoise3 $file \
+		-minsize $zotu_min_size \
 		-tabbedout $project_dir/outputs/11_clustered_otu_asv_usearch/unoise_asv_${file_name}.txt \
 		-zotus $project_dir/outputs/11_clustered_otu_asv_usearch/asv_${file_name}.fasta
 
