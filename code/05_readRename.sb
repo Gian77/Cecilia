@@ -49,7 +49,7 @@ else
 	echo -e "\n========== Rename files and reads... ==========\n"
 	#ls *.fastq -v | cat -n | sed 's/ //g' | sed 's/^/Sample/' > samples.list
 	
-	sh $project_dir/code/readRename.sh $project_dir/outputs/05_readRenamed_bash/
+	bash $project_dir/code/readRename.sh $project_dir/outputs/05_readRenamed_bash/
 
 	# I have a better solution now! To remove this later on
 	#while read line; do 

@@ -13,8 +13,9 @@ project_dir="/mnt/home/benucci/Cecilia"
 MSUusername="benucci"
 
 # Databases
-euk_db="/mnt/home/benucci/CONSTAX_taxonomy/dbs/UNITE/sh_general_release_dynamic_s_all_29.11.2022_dev.fasta"
-bac_db="/mnt/home/benucci/CONSTAX_taxonomy/dbs/SILVA/SILVA_138_SSURef_tax_silva_bact_arch.fasta"
+euk_db="/mnt/home/benucci/DATABASES/UNITE/EUKARYOTES/sh_general_release_dynamic_s_all_04.04.2024.fasta"
+fun_db="/mnt/home/benucci/DATABASES/UNITE/FUNGI/sh_general_release_dynamic_s_04.04.2024.fasta"
+bac_db="/mnt/home/benucci/DATABASES/SILVA/SILVA_138_SSURef_tax_silva_bact_arch.fasta"
 bonito_isolates="/mnt/home/benucci/CONSTAX_taxonomy/dbs/isolates_bonitolab2021.fasta"
 SynCom="/mnt/home/benucci/CONSTAX_taxonomy/dbs/SynCom_N40.fasta"
 kevin_synt="/mnt/home/benucci/CONSTAX_taxonomy/dbs/synthetic_kevin.fasta"
@@ -22,21 +23,21 @@ phix_db="/mnt/research/ShadeLab/Benucci/databases/phix_index/my_phix"
 
 # These are the main Cecilia-test run-related parameters - very important!
 # For details about these parameters, refer to the README.md file.
-DNAmarker=16S
+DNAmarker=ITS
 primers=yes
 R1=yes
 R2=no
 assemble=no
-min_overlap=50
+min_overlap=0
 rename=yes
 stripleft=no
 stripleft_bp=0
 max_Eerr=1.0
 test_length=yes
 usrer_only=no
-user_length=230
+user_length=240
 cluster_otu=yes
-otu_min_size=2
+otu_min_size=1
 cluster_asv=yes
 zotu_min_size=4
 cluster_swarm=no
@@ -45,11 +46,11 @@ cluster_swarm=no
 SINTAX=/mnt/research/rdp/public/thirdParty/usearch11.0.667_i86linux64
 RDP=/mnt/home/benucci/anaconda2/envs/constax2/share/rdptools-2.0.3-1/classifier
 CONSTAX=/mnt/home/benucci/anaconda2/envs/constax2/opt/constax-2.0.19-0
-train_db=no
-trainfiles_euk="/mnt/home/benucci/CONSTAX_taxonomy/dbs/UNITE/trainfiles_unite29112022"
-trainfiles_bac="/mnt/home/benucci/CONSTAX_taxonomy/dbs/SILVA/trainfiles_silva138"
+train_db=yes
+trainfiles_euk="/mnt/home/benucci/DATABASES/UNITE/EUKARYOTES/trainfiles_unite040424"
+trainfiles_bac="/mnt/home/benucci/DATABASES/SILVA/trainfiles_silva138"
 constax_conf=0.7
-isolates_fasta=$SynCom
+isolates_fasta=$bonito_isolates
 
 #Add the primers used in the library prep. Some are listed, but maybe you need to add.
 #fwd_primer="TATYGYTCTTNAACGAGGAATC" # amf fwd primer (Author here)
@@ -73,9 +74,13 @@ isolates_fasta=$SynCom
 #rev_primer_RC="AAGTCGTAACAAGGTAACC" # 1492R rev compl
 
 #fwd_primer="CCTACGGGNGGCWGCAG" CCTACGGGAGGCAGCAG# 341F fwd primer (Albersten et al., PLoS ONE. 2015;10:e0132783)
-fwd_primer="CCTACGGGAGGCAGCAG" # 341F fwd primer (Albersten et al., PLoS ONE. 2015;10:e0132783)
-rev_primer="GGACTACHVGGGTWTCTAAT" # 806R rev primer (Apprill et al., 2015. modified by Caporaso)
-rev_primer_RC="ATTAGAWACCCBDGTAGTCC" # 806R rev compl
+#fwd_primer="CCTACGGGAGGCAGCAG" # 341F fwd primer (Albersten et al., PLoS ONE. 2015;10:e0132783)
+#rev_primer="GGACTACHVGGGTWTCTAAT" # 806R rev primer (Apprill et al., 2015. modified by Caporaso)
+#rev_primer_RC="ATTAGAWACCCBDGTAGTCC" # 806R rev compl
+
+fwd_primer="GGAAGTAAAAGTCGTAACAAGG" #ITS5-1737F Novogene primers for ITS
+rev_primer="GCTGCGTTCTTCATCGATGC" #ITS2-2043R
+rev_primer_RC="GCATCGATGAAGAACGCAGC" #ITS2-2043R rev comp
 
 #fwd_primer="GTGCCAGCMGCCGCGGTAA" # 515F fwd primer (Parada et al., 2016 modified by Caporaso)
 #rev_primer="GGACTACHVGGGTWTCTAAT" # 806R rev primer (Apprill et al., 2015. modified by Caporaso)

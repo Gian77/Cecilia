@@ -34,7 +34,7 @@ else
 			-fastq_stripleft $stripleft_bp \
 			-fastqout $project_dir/outputs/07_readTrimDemux_usearch/trimmed.fastq 
 
-		sh $project_dir/code/compareSeqQual.sh $project_dir/outputs/06_primerStrip_cutadapt/
+		bash $project_dir/code/compareSeqQual.sh $project_dir/outputs/06_primerStrip_cutadapt/
 
 		/mnt/research/rdp/public/thirdParty/usearch11.0.667_i86linux64 \
 			-fastq_eestats2 $project_dir/outputs/07_readTrimDemux_usearch/trimmed.fastq \
@@ -43,7 +43,7 @@ else
 	else 
 		echo -e "\n You chose to remove $stripleft_bp bp from the front of R1 reads...\n"
 
-		sh $project_dir/code/compareSeqQual.sh $project_dir/outputs/06_primerStrip_cutadapt/
+		bash $project_dir/code/compareSeqQual.sh $project_dir/outputs/06_primerStrip_cutadapt/
 
 		/mnt/research/rdp/public/thirdParty/usearch11.0.667_i86linux64 \
 			-fastq_eestats2 $project_dir/outputs/06_primerStrip_cutadapt/pooled.fastq \
