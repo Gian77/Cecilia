@@ -23,7 +23,7 @@ phix_db="/mnt/research/ShadeLab/Benucci/databases/phix_index/my_phix"
 
 # These are the main Cecilia-test run-related parameters - very important!
 # For details about these parameters, refer to the README.md file.
-DNAmarker=ITS
+DNAmarker=16S
 primers=yes
 R1=yes
 R2=no
@@ -46,7 +46,7 @@ cluster_swarm=no
 SINTAX=/mnt/research/rdp/public/thirdParty/usearch11.0.667_i86linux64
 RDP=/mnt/home/benucci/anaconda2/envs/constax2/share/rdptools-2.0.3-1/classifier
 CONSTAX=/mnt/home/benucci/anaconda2/envs/constax2/opt/constax-2.0.19-0
-train_db=yes
+train_db=no
 trainfiles_euk="/mnt/home/benucci/DATABASES/UNITE/EUKARYOTES/trainfiles_unite040424"
 trainfiles_bac="/mnt/home/benucci/DATABASES/SILVA/trainfiles_silva138"
 constax_conf=0.7
@@ -78,13 +78,13 @@ isolates_fasta=$bonito_isolates
 #rev_primer="GGACTACHVGGGTWTCTAAT" # 806R rev primer (Apprill et al., 2015. modified by Caporaso)
 #rev_primer_RC="ATTAGAWACCCBDGTAGTCC" # 806R rev compl
 
-fwd_primer="GGAAGTAAAAGTCGTAACAAGG" #ITS5-1737F Novogene primers for ITS
-rev_primer="GCTGCGTTCTTCATCGATGC" #ITS2-2043R
-rev_primer_RC="GCATCGATGAAGAACGCAGC" #ITS2-2043R rev comp
+#fwd_primer="GGAAGTAAAAGTCGTAACAAGG" #ITS5-1737F Novogene primers for ITS
+#rev_primer="GCTGCGTTCTTCATCGATGC" #ITS2-2043R
+#rev_primer_RC="GCATCGATGAAGAACGCAGC" #ITS2-2043R rev comp
 
-#fwd_primer="GTGCCAGCMGCCGCGGTAA" # 515F fwd primer (Parada et al., 2016 modified by Caporaso)
-#rev_primer="GGACTACHVGGGTWTCTAAT" # 806R rev primer (Apprill et al., 2015. modified by Caporaso)
-#rev_primer_RC="ATTAGAWACCCBDGTAGTCC" # 806R rev compl https://earthmicrobiome.org/protocols-and-standards/16s/
+fwd_primer="GTGCCAGCMGCCGCGGTAA" # 515F fwd primer (Parada et al., 2016 modified by Caporaso)
+rev_primer="GGACTACHVGGGTWTCTAAT" # 806R rev primer (Apprill et al., 2015. modified by Caporaso)
+rev_primer_RC="ATTAGAWACCCBDGTAGTCC" # 806R rev compl https://earthmicrobiome.org/protocols-and-standards/16s/
 
 #****************************** END OF USER INPUT **************************#
 #===========================================================================#

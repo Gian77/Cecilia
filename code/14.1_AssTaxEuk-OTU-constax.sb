@@ -1,12 +1,12 @@
 #!/bin/bash -login
 
-#SBATCH --time=12:00:00
+#SBATCH --time=06:00:00
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
-#SBATCH --cpus-per-task=32
-#SBATCH --mem=64G
+#SBATCH --cpus-per-task=16
+#SBATCH --mem=256G
 #SBATCH --job-name 141eukotu
-#SBATCH -A glbrc
+#SBATCH -A shade-cole-bonito
 
 cd ${SLURM_SUBMIT_DIR}
 cores=$SLURM_CPUS_PER_TASK
@@ -22,14 +22,19 @@ echo -e "\n========== Sub-directories ==========\n"
 echo "mkdir -p $project_dir/outputs/14_constax_euk/"; mkdir -p $project_dir/outputs/14_constax_euk/
 echo "cd $project_dir/outputs/11_clustered_otu_asv_usearch/"; cd $project_dir/outputs/11_clustered_otu_asv_usearch/
 
+echo -e " \n========== Unset variable for Java ==========\n"
+unset _JAVA_OPTIONS
+
 echo -e " \n========== Train reference database ==========\n"
+
 conda activate constax2
+
 #echo -e "CONSTAX version: `constax --version`"
 
 if [[ "$train_db" == "yes" ]]; then
 		echo -e "Training the reference Database"
 		first_file=$(ls $project_dir/outputs/11_clustered_otu_asv_usearch/otus*.fasta | head -1)
-		cat $first_file | awk "/^>/ {n++} n>2 {exit} {print}" >  $project_dir/outputs/14_constax_euk/train.fasta
+		cat $first_file | awk "/^>/ {n++} n>2 {exit} {print}" > $project_dir/outputs/14_constax_euk/train.fasta
 
 		constax \
 			--num_threads $cores \
@@ -53,7 +58,7 @@ echo -e "\n Training files as below:\n `ls -l $trainfiles_euk/`\n"
 for file in otus*.fasta; do 
 	echo -e " \n========== Assigning taxonomy for $file ==========\n"
 	file_name=$( echo $file | cut -f 1 -d"." )
-	
+
 	constax \
 		--num_threads $cores \
 		--mem $RAM \
@@ -76,6 +81,12 @@ for file in otus*.fasta; do
 done
 
 conda deactivate
+
+echo -e " \n========== Move constax2 files to target dir ==========\n"
+
+mv $project_dir/outputs/11_clustered_otu_asv_usearch/log_constax2*  $project_dir/outputs/14_constax_euk/
+mv $project_dir/outputs/11_clustered_otu_asv_usearch/ver_python.txt  $project_dir/outputs/14_constax_euk/ver_python.txt
+mv $project_dir/outputs/11_clustered_otu_asv_usearch/rdp_train.out  $project_dir/outputs/14_constax_euk/rdp_train.out 
 
 echo -e "\n========= Sbatch log =========\n"
 echo -e "\n Current directory: `pwd` \n"
