@@ -26,6 +26,9 @@ else
 	echo -e "mkdir $project_dir/outputs/02_rawQuality_fqc/"; mkdir $project_dir/outputs/02_rawQuality_fqc/
 	echo -e "cd $project_dir/rawdata"; cd $project_dir/rawdata
 
+	echo -e " \n========== Unset variable for Java ==========\n"
+	unset _JAVA_OPTIONS
+
 	echo -e "\n========= Read quality with FastQC =========\n"
 	conda activate fastqc
 	echo -e "FastQC version: `fastqc --version`"

@@ -22,6 +22,9 @@ echo -e "\n========== Sub-directories ==========\n"
 echo "mkdir -p $project_dir/outputs/14_constax_bac/"; mkdir -p $project_dir/outputs/14_constax_bac/
 echo "cd $project_dir/outputs/11_clustered_otu_asv_usearch/"; cd $project_dir/outputs/11_clustered_otu_asv_usearch/
 
+echo -e " \n========== Unset variable for Java ==========\n"
+unset _JAVA_OPTIONS
+
 echo -e " \n========== Train reference database ==========\n"
 
 if [[ "$train_db" == "yes" ]]; then

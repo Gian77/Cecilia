@@ -23,7 +23,7 @@ phix_db="/mnt/research/ShadeLab/Benucci/databases/phix_index/my_phix"
 
 # These are the main Cecilia-test run-related parameters - very important!
 # For details about these parameters, refer to the README.md file.
-DNAmarker=16S
+DNAmarker=ITS
 primers=yes
 R1=yes
 R2=no
@@ -34,9 +34,9 @@ stripleft=no
 stripleft_bp=0
 max_Eerr=1.0
 test_length=yes
-usrer_only=no
+user_only=no
 user_length=240
-cluster_otu=yes
+cluster_otu=no
 otu_min_size=1
 cluster_asv=yes
 zotu_min_size=4
@@ -61,9 +61,9 @@ isolates_fasta=$bonito_isolates
 #rev_primer="TCCTCCGCTTATTGATATGC" # ITS4 rev primer (White et al. 1990)
 #rev_primer_RC="GCATATCAATAAGCGGAGGA" # ITS4 rev compl
 
-#fwd_primer="CTTGGTCATTTAGAGGAAGTAA" # ITS1F fwd primer (White et al. 1990)
-#rev_primer="GCTGCGTTCTTCATCGATGC" # ITS2 rev primer (White et al. 1990)
-#rev_primer_RC="GCATCGATGAAGAACGCAGC" # ITS2 rev compl
+fwd_primer="CTTGGTCATTTAGAGGAAGTAA" # ITS1F fwd primer (White et al. 1990)
+rev_primer="GCTGCGTTCTTCATCGATGC" # ITS2 rev primer (White et al. 1990)
+rev_primer_RC="GCATCGATGAAGAACGCAGC" # ITS2 rev compl
 
 #fwd_primer="AACTTTYRRCAAYGGATCWCT" # 5.8S-FUN fwd primer (Taylor et al., 2016))
 #rev_primer="AGCCTCCGCTTATTGATATGCTTAART" # ITS4-FUN rev primer (Taylor et al., 2016))
@@ -82,9 +82,9 @@ isolates_fasta=$bonito_isolates
 #rev_primer="GCTGCGTTCTTCATCGATGC" #ITS2-2043R
 #rev_primer_RC="GCATCGATGAAGAACGCAGC" #ITS2-2043R rev comp
 
-fwd_primer="GTGCCAGCMGCCGCGGTAA" # 515F fwd primer (Parada et al., 2016 modified by Caporaso)
-rev_primer="GGACTACHVGGGTWTCTAAT" # 806R rev primer (Apprill et al., 2015. modified by Caporaso)
-rev_primer_RC="ATTAGAWACCCBDGTAGTCC" # 806R rev compl https://earthmicrobiome.org/protocols-and-standards/16s/
+#fwd_primer="GTGCCAGCMGCCGCGGTAA" # 515F fwd primer (Parada et al., 2016 modified by Caporaso)
+#rev_primer="GGACTACHVGGGTWTCTAAT" # 806R rev primer (Apprill et al., 2015. modified by Caporaso)
+#rev_primer_RC="ATTAGAWACCCBDGTAGTCC" # 806R rev compl https://earthmicrobiome.org/protocols-and-standards/16s/
 
 #****************************** END OF USER INPUT **************************#
 #===========================================================================#
