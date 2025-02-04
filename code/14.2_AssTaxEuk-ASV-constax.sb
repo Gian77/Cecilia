@@ -1,16 +1,16 @@
 #!/bin/bash -login
 
-#SBATCH --time=12:00:00
+#SBATCH --time=03:59:00
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
-#SBATCH --cpus-per-task=32
-#SBATCH --mem=64G
+#SBATCH --cpus-per-task=16
+#SBATCH --mem=128G
 #SBATCH --job-name 142eukasv
 #SBATCH -A glbrc
 
 cd ${SLURM_SUBMIT_DIR}
 cores=$SLURM_CPUS_PER_TASK
-RAM=$SLURM_MEM_PER_NODE
+MEM=$SLURM_MEM_PER_NODE
 
 echo -e "Cecilia v.1.0 - usearCh basEd ampliCon pIpeLine for Illumina dAta
 MIT LICENSE - Copyright © 2022 Gian M.N. Benucci, Ph.D.
@@ -22,26 +22,33 @@ echo -e "\n========== Sub-directories ==========\n"
 echo "mkdir -p $project_dir/outputs/14_constax_euk/"; mkdir -p $project_dir/outputs/14_constax_euk/
 echo "cd $project_dir/outputs/11_clustered_otu_asv_usearch/"; cd $project_dir/outputs/11_clustered_otu_asv_usearch/
 
-echo -e " \n========== Unset variable for Java ==========\n"
-unset _JAVA_OPTIONS
+echo -e " \n========== Source Anaconda2 ==========\n"
+#source /mnt/home/benucci/anaconda2.sh
+
+echo -e "\n Anaconda version: `conda --version` \n"
+
+# Set Java memory allocation dynamically based on SLURM
+#export _JAVA_OPTIONS="-Xmx$((SLURM_MEM_PER_NODE * 1024))m"
+#echo $_JAVA_OPTIONS
 
 echo -e " \n========== Train reference database ==========\n"
-conda activate constax2
-#echo -e "CONSTAX version: `constax --version`"
+conda activate constax20
+echo -e "CONSTAX version: \n `constax --version` \n"
 
+echo -e " \n========== reset _JAVA_OPTIONS ==========\n"
 if [[ "$train_db" == "yes" ]]; then
 		echo -e "Training the reference Database"
-		first_file=$(ls $project_dir/outputs/11_clustered_otu_asv_usearch/asv*.fasta | head -1)
+		first_file=$(ls ${project_dir}/outputs/11_clustered_otu_asv_usearch/asv*.fasta | head -1)
 		cat $first_file | awk "/^>/ {n++} n>2 {exit} {print}" >  $project_dir/outputs/14_constax_euk/train.fasta
 
-		constax \
+		_JAVA_OPTIONS="-Xmx"$SLURM_MEM_PER_NODE"m" constax \
 			--num_threads $cores \
-			--mem $RAM \
+			--mem $MEM \
 			--db $euk_db \
 			--input $project_dir/outputs/14_constax_euk/train.fasta \
 			--train \
 			--trainfile $trainfiles_euk/ \
-			--output /$project_dir/outputs/14_constax_euk/ \
+			--output $project_dir/outputs/14_constax_euk/ \
 			--blast \
 			--sintax_path $SINTAX \
 			--rdp_path $RDP \
@@ -53,13 +60,13 @@ fi
 
 echo -e "\n Training files as below:\n `ls -l $trainfiles_euk/`\n"
 
-for file in asv*.fasta; do 
+for file in asv*.fasta; do
 	echo -e " \n========== Assigning taxonomy for $file ==========\n"
 	file_name=$( echo $file | cut -f 1 -d"." )
-	
+
 	constax \
 		--num_threads $cores \
-		--mem $RAM \
+		--mem $MEM \
 		--db $euk_db \
 		--trainfile $trainfiles_euk/ \
 		--input $file \
@@ -69,8 +76,8 @@ for file in asv*.fasta; do
 		--high_level_db $euk_db \
 		--high_level_query_coverage=60 \
 		--high_level_percent_identity=60 \
-		--tax /$project_dir/outputs/14_constax_euk/constax_${file_name}/ \
-		--output /$project_dir/outputs/14_constax_euk/constax_${file_name}/ \
+		--tax $project_dir/outputs/14_constax_euk/constax_${file_name}/ \
+		--output $project_dir/outputs/14_constax_euk/constax_${file_name}/ \
 		--conf $constax_conf \
 		--blast \
 		--sintax_path $SINTAX \

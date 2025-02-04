@@ -7,6 +7,19 @@ echo "===> Reading the config.yaml file"
 
 #************* ALL THE FIELDS BELOW MUST BE SELECTED BY THE USER *************#
 #=============================================================================#
+
+# binaries 
+# USEARCH11="/mnt/home/benucci/usearch11"
+
+# unset JAVA variable for the new HPCC file system
+#unset _JAVA_OPTIONS
+# purge HPCC modules
+#module purge
+
+# load anaconda2
+source /mnt/home/benucci/anaconda2.sh
+
+# set path
 project_dir="/mnt/home/benucci/Cecilia"
 
 # Change your MSUusername based on MSU ID 
@@ -30,6 +43,7 @@ R2=no
 assemble=no
 min_overlap=0
 rename=yes
+count_start=379
 stripleft=no
 stripleft_bp=0
 max_Eerr=1.0
@@ -43,10 +57,10 @@ zotu_min_size=4
 cluster_swarm=no
 
 # constax2 parameters - very important!
-SINTAX=/mnt/research/rdp/public/thirdParty/usearch11.0.667_i86linux64
-RDP=/mnt/home/benucci/anaconda2/envs/constax2/share/rdptools-2.0.3-1/classifier
-CONSTAX=/mnt/home/benucci/anaconda2/envs/constax2/opt/constax-2.0.19-0
-train_db=no
+SINTAX=/mnt/research/glbrc_group/benuccigmn/TOOLS/usearch11.0.667_i86linux64
+RDP=/mnt/ufs18/nodr/home/benucci/anaconda2/envs/constax20/share/rdptools-2.0.3-1/classifier.jar
+CONSTAX=/mnt/ufs18/nodr/home/benucci/anaconda2/envs/constax20/opt/constax-2.0.20-0
+train_db=yes
 trainfiles_euk="/mnt/home/benucci/DATABASES/UNITE/EUKARYOTES/trainfiles_unite040424"
 trainfiles_bac="/mnt/home/benucci/DATABASES/SILVA/trainfiles_silva138"
 constax_conf=0.7

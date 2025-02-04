@@ -48,8 +48,10 @@ else
 
 	echo -e "\n========== Rename files and reads... ==========\n"
 	#ls *.fastq -v | cat -n | sed 's/ //g' | sed 's/^/Sample/' > samples.list
-	
-	bash $project_dir/code/readRename.sh $project_dir/outputs/05_readRenamed_bash/
+
+	#The script has been modified to accept a starting count for renaming.
+	#bash $project_dir/code/readRename.sh renameSeq.sh $project_dir/outputs/05_readRenamed_bash/
+	bash $project_dir/code/renameSeq.sh $project_dir/outputs/05_readRenamed_bash/ $count_start
 
 	# I have a better solution now! To remove this later on
 	#while read line; do 
