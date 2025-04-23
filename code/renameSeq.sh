@@ -2,35 +2,40 @@
 
 # Copyright © 2023 Gian M.N. Benucci, Ph.D.
 # email: benucci@msu.edu URL: https://github.com/Gian77
-
-# This script crename fastq files according to a $prefix name and also
+# This script renames fastq files according to a $prefix name and also
 # all the reads in each file progressively from $count to N read in the file.
 
-fastq_directory=$1  # Specify the path to the directory containing the FASTQ files
-prefix="sample"  # Specify the desired prefix for the renamed files
-count=1  # Specify the starting number for the renaming sequence
+fastq_directory=$1
+
+# Specify the path to the directory containing the FASTQ files
+prefix="sample"
+
+# Specify the desired prefix for the renamed files
+# Check if the count argument is provided
+if [[ $# -eq 2 ]]; then
+	count=$2
+	# Specify the starting number for the renaming sequence
+else
+	count=1  # Default starting number if count argument is not provided
+fi
 
 # Output file for storing old and new file names
 output_file="$fastq_directory"/file_mapping.txt
 
 # Loop through the files in the directory
 for file in "$fastq_directory"/*.fastq; do
-    # Check if the file is a regular file
-    if [[ -f "$file" ]]; then
-        # Pad the count number with leading zeros
-        count_padded=$(printf "%03d" "$count")
-	 echo $count_padded
-        sample_name="${prefix}${count_padded}"
-        new_name="${sample_name}.fastq"
-        
+	# Check if the file is a regular file
+	if [[ -f "$file" ]]; then
+	# Pad the count number with leading zeros
+	count_padded=$(printf "%03d" "$count")
+        	sample_name="${prefix}${count_padded}"
+	new_name="${sample_name}.fastq"
 	# Write old and new file names into the output file
-        echo -e "$(basename "$file")\t$new_name" >> "$output_file"
-
-        # Rename the file
-        mv "$file" "$fastq_directory/$new_name"
-        
+	echo -e "$(basename "$file")\t$new_name" >> "$output_file"
+	# Rename the file
+	mv "$file" "$fastq_directory/$new_name"
 	# Update read headers in the renamed file
-        awk -v new_prefix="$sample_name" \
+	awk -v new_prefix="$sample_name" \
             -v count_start="$count" '
             {
                 if (NR % 4 == 1) {
@@ -41,10 +46,10 @@ for file in "$fastq_directory"/*.fastq; do
                 }
             }' "$fastq_directory/$new_name" > temp.fastq
         mv temp.fastq "$fastq_directory/$new_name"
-        
-        count=$((count + 1))
+	count=$((count + 1))
     fi
 done
+
 
 #Explanation:
 
