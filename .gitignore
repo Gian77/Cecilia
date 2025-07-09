@@ -1,5 +1,6 @@
 #Files and dir NOT tracked
 
+Cecilia-results_*
 code/slurm-*.out
 rawdata/test_data/
 rawdata/*.fastq.gz

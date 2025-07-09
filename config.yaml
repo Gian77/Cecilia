@@ -8,24 +8,15 @@ echo "===> Reading the config.yaml file"
 #************* ALL THE FIELDS BELOW MUST BE SELECTED BY THE USER *************#
 #=============================================================================#
 
-# binaries 
-# USEARCH11="/mnt/home/benucci/usearch11"
+# Download USEARCH and add it where you want in your HPCC space, then create a bash variable for it.
+# USEARCH public binaries https://github.com/rcedgar/usearch12
+ 
+USEARCH="/mnt/research/glbrc_group/benuccigmn/TOOLS/usearch11.0.667_i86linux64"
 
-# unset JAVA variable for the new HPCC file system
-#unset _JAVA_OPTIONS
-# purge HPCC modules
-#module purge
-
-# load anaconda2
-source /mnt/home/benucci/anaconda2.sh
-
-# set path
+# set the project_dir PATH
 project_dir="/mnt/home/benucci/Cecilia"
 
-# Change your MSUusername based on MSU ID 
-MSUusername="benucci"
-
-# Databases
+# Databases (as many as you need) 
 euk_db="/mnt/home/benucci/DATABASES/UNITE/EUKARYOTES/sh_general_release_dynamic_s_all_04.04.2024.fasta"
 fun_db="/mnt/home/benucci/DATABASES/UNITE/FUNGI/sh_general_release_dynamic_s_04.04.2024.fasta"
 bac_db="/mnt/home/benucci/DATABASES/SILVA/SILVA_138_SSURef_tax_silva_bact_arch.fasta"
@@ -58,8 +49,8 @@ cluster_swarm=no
 
 # constax2 parameters - very important!
 SINTAX=/mnt/research/glbrc_group/benuccigmn/TOOLS/usearch11.0.667_i86linux64
-RDP=/mnt/ufs18/nodr/home/benucci/anaconda2/envs/constax20/share/rdptools-2.0.3-1/classifier.jar
-CONSTAX=/mnt/ufs18/nodr/home/benucci/anaconda2/envs/constax20/opt/constax-2.0.20-0
+RDP=/mnt/home/benucci/anaconda3/envs/constax2/share/rdptools-2.0.3-1/classifier
+CONSTAX=/mnt/home/benucci/anaconda3/envs/constax2/opt/constax-2.0.20-0
 train_db=yes
 trainfiles_euk="/mnt/home/benucci/DATABASES/UNITE/EUKARYOTES/trainfiles_unite040424"
 trainfiles_bac="/mnt/home/benucci/DATABASES/SILVA/trainfiles_silva138"
