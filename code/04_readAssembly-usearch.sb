@@ -1,14 +1,14 @@
 #!/bin/bash -login
 
-#SBATCH --time=00:30:00
+#SBATCH --time=12:00:00
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
-#SBATCH --cpus-per-task=8
-#SBATCH --mem=32G
-#SBATCH --job-name=05_rename
-#SBATCH -A shade-cole-bonito
+#SBATCH --cpus-per-task=16
+#SBATCH --mem=128G
+#SBATCH --job-name=05_assembly
+#SBATCH -A glbrc
 
-set -euo pipefail  # safer bash
+set -euo pipefail
 
 # -----------------------------------------------------------------------------
 # HEADER
@@ -26,9 +26,9 @@ EOF
 # -----------------------------------------------------------------------------
 cd "${SLURM_SUBMIT_DIR}"
 cores=${SLURM_CPUS_PER_TASK}
-RAM=${SLURM_MEM_PER_NODE:-32000}
+RAM=${SLURM_MEM_PER_NODE:-128000}
 
-echo "===> Running script: 05_readRename.sb"
+echo "===> Running script: 04_readAssembly-usearch.sb"
 
 # Load config
 source ../config.yaml
@@ -36,14 +36,13 @@ source ../config.yaml
 # -----------------------------------------------------------------------------
 # SETUP DIRECTORIES
 # -----------------------------------------------------------------------------
-output_dir="$project_dir/outputs/05_readRenamed_bash"
-slurm_dir="$project_dir/slurms"
+input_dir="$project_dir/outputs/03_removePhix_usearch"
+output_dir="$project_dir/outputs/04_readAssembly_usearch"
 stats_dir="$project_dir/stats"
-assembly_dir="$project_dir/outputs/04_readAssembly_usearch"
-phix_dir="$project_dir/outputs/03_removePhix_usearch"
+slurm_dir="$project_dir/slurms"
 
 echo -e "\n========== Creating necessary directories ==========\n"
-for dir in "$output_dir" "$slurm_dir" "$stats_dir"; do
+for dir in "$output_dir" "$stats_dir" "$slurm_dir"; do
     if [ ! -d "$dir" ]; then
         echo "Creating directory: $dir"
         mkdir -p "$dir"
@@ -52,35 +51,42 @@ for dir in "$output_dir" "$slurm_dir" "$stats_dir"; do
     fi
 done
 
-# -----------------------------------------------------------------------------
-# CHECK COMPLETION
-# -----------------------------------------------------------------------------
-if compgen -G "$output_dir/Sample*.fastq" > /dev/null; then
-    echo -e "\nRenamed files already exist. This step appears complete. Exiting.\n"
+# Skip if already completed
+if compgen -G "$output_dir"/*assembled.fastq > /dev/null; then
+    echo -e "\nAssembled files already exist. This step appears complete. Exiting.\n"
     exit 0
 fi
 
 # -----------------------------------------------------------------------------
-# COPY FILES FOR RENAMING
+# RUN ASSEMBLY
 # -----------------------------------------------------------------------------
-echo -e "\n========== Preparing input files for renaming ==========\n"
+cd "$input_dir" || { echo "ERROR: Cannot cd into $input_dir"; exit 1; }
 
-if [[ "$assemble" == "yes" ]]; then
-    echo -e "Reads were assembled. Copying from: $assembly_dir"
-    cp "$assembly_dir"/*assembled.fastq "$output_dir/"
-else
-    echo -e "Reads were not assembled. Copying from: $phix_dir"
-    cp "$phix_dir"/*nophix.fastq "$output_dir/"
-fi
+echo -e "\n========== Assembling paired-end reads with USEARCH ==========\n"
+
+while read -r R1; do
+    read -r R2
+    "$USEARCH" \
+        -fastq_mergepairs "$R1" \
+        -reverse "$R2" \
+        -fastqout "${output_dir}/${R1//nophix.fastq/assembled.fastq}"
+done < <(ls *.fastq) # use process substitution
 
 # -----------------------------------------------------------------------------
-# RENAME FILES AND READ HEADERS
+# COUNT ASSEMBLED READS
 # -----------------------------------------------------------------------------
-cd "$output_dir" || { echo "ERROR: Failed to cd into $output_dir"; exit 1; }
+echo -e "\n========== Counting assembled reads ==========\n"
 
-echo -e "\n========== Renaming files and internal read headers ==========\n"
+count_file="$stats_dir/03.assembled.counts"
+> "$count_file"
 
-bash "$project_dir/code/renameSeq.sh" "$output_dir" "$count_start"
+cd "$output_dir" || exit 1
+
+for file in *assembled.fastq; do
+    [ -f "$file" ] || continue
+    count=$(($(wc -l < "$file") / 4))
+    echo "$(basename "$file") : $count" | tee -a "$count_file"
+done
 
 # -----------------------------------------------------------------------------
 # SUMMARY
@@ -89,7 +95,6 @@ echo -e "\n========== Contents of "$output_dir" ==================\n"
 ls -lh "$output_dir"
 
 echo "\nWorking directory: $(pwd)"
-
 # -----------------------------------------------------------------------------
 # SLURM JOB LOGGING
 # -----------------------------------------------------------------------------
@@ -97,5 +102,4 @@ echo -e "\n========== SLURM Job Info ==========\n"
 sacct -u "$USER" -j "$SLURM_JOB_ID" --format=JobID,JobName,Start,End,Elapsed,NCPUS,ReqMem
 scontrol show job "$SLURM_JOB_ID"
 
-mv "$project_dir/code/slurm-$SLURM_JOB_ID"* "$slurm_dir/05_readRenamed_bash.slurm" 2>/dev/null || true
-
+mv "$project_dir/code/slurm-$SLURM_JOB_ID"* "$slurm_dir/04_readAssembly-usearch.slurm" 2>/dev/null || true

@@ -1,11 +1,11 @@
 #!/bin/bash -login
 
-#SBATCH --time=00:59:00
+#SBATCH --time=12:00:00
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=16
-#SBATCH --mem=128G
-#SBATCH --job-name=12_clusterUNOISE
+#SBATCH --mem=64G
+#SBATCH --job-name=17_taxonomy
 #SBATCH -A shade-cole-bonito
 
 set -euo pipefail
@@ -16,7 +16,7 @@ set -euo pipefail
 cat << 'EOF'
 ###############################################################################
 # Cecilia v.1.0 - usearCh basEd ampliCon pIpeLine for Illumina dAta
-# MIT LICENSE - Copyright © 2022 Gian M.N. Benucci, Ph.D.
+# MIT LICENSE - Copyright © 2025 Gian M.N. Benucci, Ph.D.
 # Email: benucci@msu.edu
 ###############################################################################
 EOF
@@ -26,9 +26,9 @@ EOF
 # -----------------------------------------------------------------------------
 cd "${SLURM_SUBMIT_DIR}"
 cores="${SLURM_CPUS_PER_TASK}"
-RAM="${SLURM_MEM_PER_NODE:-128000}"
+RAM="${SLURM_MEM_PER_NODE:-64000}"
 
-echo "===> Running script: 12_clusterUNOISE_usearch.sb"
+echo "===> Running script: 17_taxonomy_sintax.sb"
 
 # Load config
 source ../config.yaml
@@ -36,8 +36,8 @@ source ../config.yaml
 # -----------------------------------------------------------------------------
 # SETUP DIRECTORIES
 # -----------------------------------------------------------------------------
-output_dir="$project_dir/outputs/11_clustered_otu_asv_usearch"
-input_dir="$project_dir/outputs/10_dereplicateReads_usearch"
+input_dir="$project_dir/outputs/11_clustered_otu_asv_usearch"
+output_dir="$project_dir/outputs/17_taxonomy_sintax"
 mkdir -p "$output_dir"
 
 echo -e "\n========== Sub-directories ==========\n"
@@ -45,27 +45,45 @@ echo "Input directory : $input_dir"
 echo "Output directory: $output_dir"
 
 # -----------------------------------------------------------------------------
-# GENERATE ASVs AND BUILD OTU TABLE
+# ASSIGN TAXONOMY BASED ON DNA MARKER
 # -----------------------------------------------------------------------------
 cd "$input_dir"
-for file in unique*.fasta; do
-    [ -f "$file" ] || continue
-    echo -e "\n========== Generating ASVs for $(basename "$file") ==========\n"
-    file_name=$(basename "$file" | cut -f2 -d"_" | cut -f1 -d".")
 
-    $USEARCH \
-        -unoise3 "$file" \
-        -minsize "$zotu_min_size" \
-        -tabbedout "$output_dir/unoise_asv_${file_name}.txt" \
-        -zotus "$output_dir/asv_${file_name}.fasta"
+if [[ "$DNAmarker" == "ITS" || "$DNAmarker" == "16S" ]]; then
+    # Decompress reference DB if needed
+    if file "$euk_db" | grep -q 'gzip compressed'; then
+        echo "Decompressing $euk_db"
+        gunzip "$euk_db"
+        euk_db="${euk_db%.gz}"
+    else
+        echo "$euk_db is not gzipped. Continuing..."
+    fi
 
-    echo -e "\n========== Generating OTU table for $file_name ==========\n"
+    # Build database
+    echo -e "\n========== Building SINTAX database ==========\n"
     $USEARCH \
-        -threads "$cores" \
-        -otutab "$project_dir/outputs/06_primerStrip_cutadapt/pooled.fastq" \
-        -zotus "$output_dir/asv_${file_name}.fasta" \
-        -otutabout "$output_dir/asvtable_UNOISE_${file_name}.txt"
-done
+        -makeudb_usearch "$euk_db" \
+        -output "$output_dir/$(basename "${euk_db%.fasta}").udb"
+
+    # Assign taxonomy to each FASTA file
+    for file in *.fasta; do
+        [ -f "$file" ] || continue
+        echo -e "\n========== Assigning taxonomy for $(basename "$file") ==========\n"
+        file_name=$(basename "$file" .fasta)
+
+        $USEARCH \
+            -sintax "$file" \
+            -db "$output_dir/$(basename "${euk_db%.fasta}").udb" \
+            -tabbedout "$output_dir/${file_name}.sintax" \
+            -strand both \
+            -sintax_cutoff 0.8 \
+            -threads "$cores"
+    done
+else
+    echo "ERROR: Unsupported DNAmarker type '$DNAmarker'. Only 'ITS' and '16S' are allowed. 
+    If using a different marker modify 17_taxonomySintax.sb"
+    exit 1
+fi
 
 # -----------------------------------------------------------------------------
 # SUMMARY
@@ -81,5 +99,4 @@ echo "Working directory: $(pwd)"
 echo -e "\n========= Sbatch log =========\n"
 sacct -u "$USER" -j "$SLURM_JOB_ID" --format=JobID,JobName,Start,End,Elapsed,NCPUS,ReqMem || true
 scontrol show job "$SLURM_JOB_ID" || true
-mv "$project_dir"/code/slurm-"$SLURM_JOB_ID"* "$project_dir"/slurms/12_clusterUNOISE_usearch.slurm
-
+mv "$project_dir"/code/slurm-"$SLURM_JOB_ID"* "$project_dir"/slurms/17_taxonomy_sintax.slurm

@@ -1,0 +1,132 @@
+#!/bin/bash -login
+
+#SBATCH --time=02:00:00
+#SBATCH --nodes=1
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=16
+#SBATCH --mem=128G
+#SBATCH --job-name=02_fastqc
+
+set -euo pipefail  # safer bash: exit on error, undefined vars, or pipeline fail
+
+# -----------------------------------------------------------------------------
+# HEADER
+# -----------------------------------------------------------------------------
+cat << 'EOF'
+###############################################################################
+# Cecilia v.1.0 - usearCh basEd ampliCon pIpeLine for Illumina dAta
+# MIT LICENSE - Copyright © 2025 Gian M.N. Benucci, Ph.D.
+# Email: benucci@msu.edu
+###############################################################################
+EOF
+
+# -----------------------------------------------------------------------------
+# INIT
+# -----------------------------------------------------------------------------
+cd "${SLURM_SUBMIT_DIR}"
+cores=${SLURM_CPUS_PER_TASK}
+RAM=${SLURM_MEM_PER_NODE:-64000}
+
+echo "===> Running script: 02_qualityCheck-fastqc.sb"
+
+# Load config
+source ../config.yaml
+
+# -----------------------------------------------------------------------------
+# SETUP DIRECTORIES
+# -----------------------------------------------------------------------------
+output_dir="$project_dir/outputs/02_rawQuality_fqc"
+stats_dir="$project_dir/stats"
+slurm_dir="$project_dir/slurms"
+rawdata_dir="$project_dir/rawdata"
+stats_dir="$project_dir/stats"
+
+echo -e "\n========== Creating necessary directories ==========\n"
+for dir in "$output_dir" "$stats_dir" "$slurm_dir"; do
+    if [ ! -d "$dir" ]; then
+        echo "Creating directory: $dir"
+        mkdir -p "$dir"
+    else
+        echo "Directory already exists: $dir"
+    fi
+done
+
+# Skip if already completed
+if [ -f "$output_dir/R1_eestats2.results" ]; then
+    echo -e "\nStep already completed — exiting.\n"
+    exit 0
+fi
+
+# -----------------------------------------------------------------------------
+# RUN FASTQC & USEARCH EESTATS2
+# -----------------------------------------------------------------------------
+cd "$rawdata_dir" || { echo "ERROR: Cannot cd into $rawdata_dir"; exit 1; }
+
+echo -e "\n========== Read quality assessment with FastQC ==========\n"
+module purge
+module load Miniforge3
+conda activate fastqc
+
+echo "FastQC version: $(fastqc --version)"
+
+# Concatenate and assess quality
+cat *R1*.fastq > R1_read.fastq
+cat *R2*.fastq > R2_read.fastq
+
+fastqc R1_read.fastq R2_read.fastq \
+    --threads "$cores" \
+    --outdir "$output_dir"
+
+"$USEARCH" \
+    -fastq_eestats2 R1_read.fastq \
+    -output "$output_dir/R1_eestats2.results" \
+    -length_cutoffs 100,500,1
+
+# Clean up temp files
+rm -f R1_read.fastq R2_read.fastq
+
+conda deactivate
+
+# -----------------------------------------------------------------------------
+# RAW READ COUNTS
+# -----------------------------------------------------------------------------
+echo -e "\n========== Counting raw reads per FASTQ file ==========\n"
+> "$stats_dir/01.raw.counts" # Clear, if exist, or create the output file
+
+for file in *.fastq; do
+    [ -f "$file" ] || continue
+    count=$(($(wc -l < "$file") / 4))
+    echo "$file : $count" | tee -a "$stats_dir/01.raw.counts"
+done
+
+# -----------------------------------------------------------------------------
+# FASTX_INFO METADATA
+# -----------------------------------------------------------------------------
+echo -e "\n========== Running fastx_info on all FASTQ files ==========\n"
+fastx_info_dir="$output_dir/fastq_info"
+mkdir -p "$fastx_info_dir"
+
+for file in *.fastq; do
+    [ -f "$file" ] || continue
+    "$USEARCH" \
+        -fastx_info "$file" \
+        -output "$fastx_info_dir/${file%.fastq}.info"
+done
+
+# -----------------------------------------------------------------------------
+# SUMMARY
+# -----------------------------------------------------------------------------
+echo -e "\n========== Contents of "$output_dir" ==================\n"
+ls -lh "$output_dir"
+
+echo "Working directory: $(pwd)"
+
+# -----------------------------------------------------------------------------
+# SLURM JOB LOGGING
+# -----------------------------------------------------------------------------
+echo -e "\n========== SLURM Job Info ==========\n"
+sacct -u "$USER" -j "$SLURM_JOB_ID" --format=JobID,JobName,Start,End,Elapsed,NCPUS,ReqMem
+scontrol show job "$SLURM_JOB_ID"
+
+# Move SLURM log to slurms folder
+mv "$project_dir/code/slurm-$SLURM_JOB_ID"* "$slurm_dir/02_checkQuality-fastqc.slurm" 2>/dev/null || true

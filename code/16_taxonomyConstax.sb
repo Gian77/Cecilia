@@ -31,8 +31,8 @@ echo -e " \n========== Train reference database ==========\n"
 conda activate constax2
 
 #echo -e "CONSTAX version: `constax --version`"
-
-if [[ "$train_db" == "yes" ]]; then
+if [[ "$DNAmarker" == "ITS" ]]; then
+	if [[ "$train_db" == "yes" ]]; then
 		echo -e "Training the reference Database"
 		first_file=$(ls $project_dir/outputs/11_clustered_otu_asv_usearch/otus*.fasta | head -1)
 		cat $first_file | awk "/^>/ {n++} n>2 {exit} {print}" > $project_dir/outputs/14_constax_euk/train.fasta
@@ -50,13 +50,13 @@ if [[ "$train_db" == "yes" ]]; then
 			--rdp_path $RDP \
 			--constax_path $CONSTAX
 
-elif [[ "$train_db" == "no" ]]; then
+	elif [[ "$train_db" == "no" ]]; then
 		echo -e "You reference database is already trained. Skipping!"
-fi
+	fi
 
-echo -e "\n Training files as below:\n `ls -l $trainfiles_euk/`\n"
+	echo -e "\n Training files as below:\n `ls -l $trainfiles_euk/`\n"
 
-for file in otus*.fasta; do 
+	for file in *.fasta; do 
 	echo -e " \n========== Assigning taxonomy for $file ==========\n"
 	file_name=$( echo $file | cut -f 1 -d"." )
 
@@ -79,7 +79,75 @@ for file in otus*.fasta; do
 		--sintax_path $SINTAX \
 		--rdp_path $RDP \
 		--constax_path $CONSTAX
-done
+	done
+
+fi
+
+if [[ "$DNAmarker" == "16S" ]]; then
+
+	if [[ "$train_db" == "yes" ]]; then
+
+		echo -e "Training the reference Database"
+		echo "mkdir -p $project_dir/outputs/14_constax_bac/db_training/"; mkdir -p $project_dir/outputs/14_constax_bac/db_training/
+
+		first_file=$(ls $project_dir/outputs/11_clustered_otu_asv_usearch/otus*.fasta | head -1)
+		cat $first_file | awk "/^>/ {n++} n>2 {exit} {print}" >  $project_dir/outputs/14_constax_bac/train.fasta
+
+		conda activate constax2
+
+		constax \
+			--num_threads $cores \
+			--mem $RAM \
+			--db $bac_db \
+			--input $project_dir/outputs/14_constax_bac/train.fasta \
+			--train \
+			--trainfile $trainfiles_bac/ \
+			--blast \
+			--output /$project_dir/outputs/14_constax_bac/ \
+			--sintax_path $SINTAX \
+			--rdp_path $RDP \
+			--constax_path $CONSTAX
+
+		conda deactivate
+
+
+	elif [[ "$train_db" == "no" ]]; then
+
+		echo -e "You reference database is already trained. Skipping!"
+		echo -e "\n Training files as below:\n `ls -l $trainfiles_bac/`\n"
+
+	fi
+
+
+	for file in *.fasta; do 
+
+		echo -e " \n========== Assigning taxonomy for $file ==========\n"
+		file_name=$( echo $file | cut -f 1 -d"." )
+	
+		constax \
+			--num_threads $cores \
+			--mem $RAM \
+			--db $bac_db \
+			--trainfile $trainfiles_bac/ \
+			--input $file \
+			--isolates $isolates_fasta \
+			--isolates_query_coverage=90 \
+			--isolates_percent_identity=90 \
+			--high_level_db $bac_db \
+			--high_level_query_coverage=60 \
+			--high_level_percent_identity=60 \
+			--tax /$project_dir/outputs/14_constax_bac/constax_${file_name}/ \
+			--output /$project_dir/outputs/14_constax_bac/constax_${file_name}/ \
+			--conf $constax_conf \
+			--blast \
+			--sintax_path $SINTAX \
+			--rdp_path $RDP \
+			--constax_path $CONSTAX
+	done
+
+   fi
+
+fi
 
 conda deactivate
 

@@ -1,11 +1,11 @@
 #!/bin/bash -login
 
-#SBATCH --time=00:59:00
+#SBATCH --time=12:00:00
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=16
-#SBATCH --mem=128G
-#SBATCH --job-name=12_clusterUNOISE
+#SBATCH --mem=64G
+#SBATCH --job-name=13_clusterSWARMS
 #SBATCH -A shade-cole-bonito
 
 set -euo pipefail
@@ -26,9 +26,9 @@ EOF
 # -----------------------------------------------------------------------------
 cd "${SLURM_SUBMIT_DIR}"
 cores="${SLURM_CPUS_PER_TASK}"
-RAM="${SLURM_MEM_PER_NODE:-128000}"
+RAM="${SLURM_MEM_PER_NODE:-64000}"
 
-echo "===> Running script: 12_clusterUNOISE_usearch.sb"
+echo "===> Running script: 15_clusterSWARM_swarm.sb"
 
 # Load config
 source ../config.yaml
@@ -36,8 +36,8 @@ source ../config.yaml
 # -----------------------------------------------------------------------------
 # SETUP DIRECTORIES
 # -----------------------------------------------------------------------------
-output_dir="$project_dir/outputs/11_clustered_otu_asv_usearch"
 input_dir="$project_dir/outputs/10_dereplicateReads_usearch"
+output_dir="$project_dir/outputs/11_clustered_otu_asv_usearch"
 mkdir -p "$output_dir"
 
 echo -e "\n========== Sub-directories ==========\n"
@@ -45,26 +45,47 @@ echo "Input directory : $input_dir"
 echo "Output directory: $output_dir"
 
 # -----------------------------------------------------------------------------
-# GENERATE ASVs AND BUILD OTU TABLE
+# SWARM CLUSTERING AND OTU TABLE GENERATION
 # -----------------------------------------------------------------------------
 cd "$input_dir"
-for file in unique*.fasta; do
+for file in *linear.fasta; do
     [ -f "$file" ] || continue
-    echo -e "\n========== Generating ASVs for $(basename "$file") ==========\n"
+    echo -e "\n========== Clustering SWARMs for $(basename "$file") ==========\n"
     file_name=$(basename "$file" | cut -f2 -d"_" | cut -f1 -d".")
 
-    $USEARCH \
-        -unoise3 "$file" \
-        -minsize "$zotu_min_size" \
-        -tabbedout "$output_dir/unoise_asv_${file_name}.txt" \
-        -zotus "$output_dir/asv_${file_name}.fasta"
+    module purge
+    module load Miniforge3
+    conda activate swarm
+    echo "swarm version: $(swarm --version)"
 
-    echo -e "\n========== Generating OTU table for $file_name ==========\n"
+    swarm \
+        --differences 1 \
+        --fastidious \
+        --usearch-abundance \
+        --threads "$cores" \
+        --statistics-file "$output_dir/clusters_${file_name}_stats.txt" \
+        --seeds "$output_dir/clusters_${file_name}.fasta" \
+        "$file" > /dev/null
+
+    conda deactivate
+
+    echo -e "\n========== Generating SWARM OTU table for $file_name ==========\n"
     $USEARCH \
         -threads "$cores" \
+        -relabel SWARM_ \
+        -unoise3 "$output_dir/clusters_${file_name}.fasta" \
+        -tabbedout "$output_dir/swarms_${file_name}.txt" \
+        -zotus "$output_dir/swarms_${file_name}.fasta"
+
+     $USEARCH \
+        -threads "$cores" \
         -otutab "$project_dir/outputs/06_primerStrip_cutadapt/pooled.fastq" \
-        -zotus "$output_dir/asv_${file_name}.fasta" \
-        -otutabout "$output_dir/asvtable_UNOISE_${file_name}.txt"
+        -zotus "$output_dir/swarms_${file_name}.fasta" \
+        -otutabout "$output_dir/otutable_SWARM_${file_name}.txt"
+
+    # Clean intermediate files
+    rm -f "$output_dir/clusters_${file_name}.fasta" \
+          "$output_dir/clusters_${file_name}_stats.txt"
 done
 
 # -----------------------------------------------------------------------------
@@ -79,7 +100,6 @@ echo "Working directory: $(pwd)"
 # LOG
 # -----------------------------------------------------------------------------
 echo -e "\n========= Sbatch log =========\n"
-sacct -u "$USER" -j "$SLURM_JOB_ID" --format=JobID,JobName,Start,End,Elapsed,NCPUS,ReqMem || true
+sacct -u "$USER" -j "$SLURM_JOB_ID" --format=JobID,JobName,Start,End,Elapsed,NCPUS,ReqMem" || true
 scontrol show job "$SLURM_JOB_ID" || true
-mv "$project_dir"/code/slurm-"$SLURM_JOB_ID"* "$project_dir"/slurms/12_clusterUNOISE_usearch.slurm
-
+mv "$project_dir"/code/slurm-"$SLURM_JOB_ID"* "$project_dir"/slurms/13_clusterSWARMS_swarm3.slurm

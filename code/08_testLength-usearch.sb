@@ -1,96 +1,146 @@
 #!/bin/bash -login
 
-#SBATCH --time=014:00:00
+#SBATCH --time=14:00:00
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=32
 #SBATCH --mem=64G
-#SBATCH --job-name 8testlength
-#SBACTH -A shade-cole-bonito
+#SBATCH --job-name 08_testlength
+#SBATCH -A shade-cole-bonito
 
-cd ${SLURM_SUBMIT_DIR}
-cores=$SLURM_CPUS_PER_TASK
-RAM=$SLURM_MEM_PER_NODE
+set -euo pipefail
 
-echo -e "Cecilia v.1.0 - usearCh basEd ampliCon pIpeLine for Illumina dAta
-MIT LICENSE - Copyright © 2022 Gian M.N. Benucci, Ph.D.
-email: benucci[at]msu[dot]edu\n"
+# -----------------------------------------------------------------------------
+# HEADER
+# -----------------------------------------------------------------------------
+cat << 'EOF'
+###############################################################################
+# Cecilia v.1.0 - usearCh basEd ampliCon pIpeLine for Illumina dAta
+# MIT LICENSE - Copyright © 2022 Gian M.N. Benucci, Ph.D.
+# Email: benucci@msu.edu
+###############################################################################
+EOF
 
+# -----------------------------------------------------------------------------
+# INIT
+# -----------------------------------------------------------------------------
+cd "${SLURM_SUBMIT_DIR}"
+cores=${SLURM_CPUS_PER_TASK}
+RAM=${SLURM_MEM_PER_NODE:-32000}
+
+echo "===> Running script: 08_testLength-usearch.sb"
+
+# Load config
 source ../config.yaml
 
-echo -e "\n========== Sub-directories ==========\n"
-if [ -d $project_dir/outputs/08_testLength_usearch/ ]; then
-	echo -e "\n Directory exist! I performed this step already. Exiting... \n"
-else
-	echo "mkdir $project_dir/outputs/08_testLength_usearch"; mkdir $project_dir/outputs/08_testLength_usearch/
+# -----------------------------------------------------------------------------
+# SETUP DIRECTORIES
+# -----------------------------------------------------------------------------
+output_dir="$project_dir/outputs/08_testLength_usearch"
+slurm_dir="$project_dir/slurms"
+stats_dir="$project_dir/stats"
 
-	echo -e "\n========== Generate number of OTUs at each length tested. ==========\n"
-	if [[ "$stripleft" == "yes" ]]; then
-			# changing the header before the first . using syntax of first~step to work evry 4 lines. 		
-			sed '1~4s/.*\./@newstring./g' $project_dir/outputs/07_readTrimDemux_usearch/trimmed.fastq > \
-					 $project_dir/outputs/08_testLength_usearch/trimmed_renamed.fasta
-			source_file=$project_dir/outputs/08_testLength_usearch/trimmed_renamed.fasta
-			echo -e "\n You chose to use the trimmed reads at: \n $source_file \n"
-		else 
-			sed '1~4s/.*\./@newstring./g' $project_dir/outputs/06_primerStrip_cutadapt/pooled.fastq > \
-					 $project_dir/outputs/08_testLength_usearch/pooled_renamed.fasta
-			source_file=$project_dir/outputs/08_testLength_usearch/pooled_renamed.fasta
-			echo -e "\n You chose to use the non-trimmed reads at: \n $source_file \n"
-	fi
+echo -e "\n========== Creating necessary directories ==========\n"
+for dir in "$output_dir" "$slurm_dir" "$stats_dir"; do
+    if [ ! -d "$dir" ]; then
+        echo "Creating directory: $dir"
+        mkdir -p "$dir"
+    else
+        echo "Directory already exists: $dir"
+    fi
+done
 
-	touch $project_dir/outputs/08_testLength_usearch/testLength.results
-	header=$(echo -e "Length" "\t" "Filtered" "\t" "Uniques" "\t" "Otus") 
-	(echo "$header" && cat $project_dir/outputs/08_testLength_usearch/testLength.results) > \
-		$project_dir/outputs/08_testLength_usearch/testLength.results
-
-	# generating OTUs at each bp length difference 
-	for i in $(seq -w 150 300); do
-	/mnt/research/rdp/public/thirdParty/usearch11.0.667_i86linux64 \
-		-threads $cores \
-		-fastq_filter $source_file \
-		-fastq_maxee $max_Eerr \
-		-fastq_stripleft $stripleft_bp \
-		-fastq_trunclen $i \
-		-fastq_maxns 0 \
-		-fastqout $project_dir/outputs/08_testLength_usearch/filtered_${i}.fastq
-
-	/mnt/research/rdp/public/thirdParty/usearch11.0.667_i86linux64 \
-		-threads $cores \
-		-fastx_uniques $project_dir/outputs/08_testLength_usearch/filtered_${i}.fastq \
-		-fastaout $project_dir/outputs/08_testLength_usearch/uniques_${i}.fasta \
-		-sizeout
-
-	/mnt/research/rdp/public/thirdParty/usearch11.0.667_i86linux64 \
-		-threads $cores \
-		-minsize 2 \
-		-relabel OTU_ \
-		-cluster_otus $project_dir/outputs/08_testLength_usearch/uniques_${i}.fasta \
-		-otus $project_dir/outputs/08_testLength_usearch/otus_${i}.fasta \
-		-uparseout $project_dir/outputs/08_testLength_usearch/uparse_otus_${i}.txt
-		
-		filt=$(grep -c "^@newstring" $project_dir/outputs/08_testLength_usearch/filtered_${i}.fastq)
-		unique=$(grep -c "^>newstring" $project_dir/outputs/08_testLength_usearch/uniques_${i}.fasta)
-		otu=$(grep -c "^>OTU" $project_dir/outputs/08_testLength_usearch/otus_${i}.fasta)
-
-		echo -e "$i" "\t" $filt "\t" $unique "\t" $otu >> $project_dir/outputs/08_testLength_usearch/testLength.results
-
-			rm $project_dir/outputs/08_testLength_usearch/filtered_${i}.fastq
-			rm $project_dir/outputs/08_testLength_usearch/uniques_${i}.fasta
-			rm $project_dir/outputs/08_testLength_usearch/otus_${i}.fasta
-			rm $project_dir/outputs/08_testLength_usearch/uparse_otus_${i}.txt
-	done
-
-	echo -e "\n========= Plotting OTU number by each pb read length =========\n"
-	conda activate R
-	cd $project_dir/outputs/08_testLength_usearch/
-	Rscript $project_dir/code/testLength.R
-	conda deactivate
-		
-	#mv $project_dir/code/*.pdf $project_dir/outputs/08_testLength_usearch/
+# -----------------------------------------------------------------------------
+# CHECK COMPLETION
+# -----------------------------------------------------------------------------
+if [ "$(ls -A "$output_dir")" ]; then
+    echo -e "\nDirectory exists and is not empty! This step was already performed. Exiting...\n"
+    exit 0
 fi
 
-echo -e "\n========= Sbatch log =========\n"
-echo -e "\n Current directory: `pwd` \n"
-echo -e "\n `sacct -u $MSUusername -j $SLURM_JOB_ID --format=JobID,JobName,Start,End,Elapsed,NCPUS,ReqMem` \n"
-scontrol show job $SLURM_JOB_ID
-mv $project_dir/code/slurm-$SLURM_JOB_ID* $project_dir/slurms/08_testLength-usearch.slurm
+# -----------------------------------------------------------------------------
+# CLUSTER OTUs AT EACH BP LENGTH
+# -----------------------------------------------------------------------------
+
+echo -e "\n========== Generate number of OTUs at each length tested ==========\n"
+
+# Choose source file based on stripleft setting
+if [[ "$stripleft" == "yes" ]]; then
+    sed '1~4s/.*\./@newstring./g' "$project_dir/outputs/07_readTrimDemux_usearch/trimmed.fastq" > \
+        "$output_dir/trimmed_renamed.fasta"
+    source_file="$output_dir/trimmed_renamed.fasta"
+    echo -e "\nUsing trimmed reads at: $source_file\n"
+else
+    sed '1~4s/.*\./@newstring./g' "$project_dir/outputs/06_primerStrip_cutadapt/pooled.fastq" > \
+        "$output_dir/pooled_renamed.fasta"
+    source_file="$output_dir/pooled_renamed.fasta"
+    echo -e "\nUsing non-trimmed reads at: $source_file\n"
+fi
+
+# Initialize results file
+results_file="$output_dir/testLength.results"
+echo -e "Length\tFiltered\tUniques\tOtus" > "$results_file"
+
+# Loop over sequence lengths
+for i in $(seq -w 150 300); do
+    $USEARCH -threads "$cores" \
+        -fastq_filter "$source_file" \
+        -fastq_maxee "$max_Eerr" \
+        -fastq_stripleft "$stripleft_bp" \
+        -fastq_trunclen "$i" \
+        -fastq_maxns 0 \
+        -fastqout "$output_dir/filtered_${i}.fastq"
+
+    $USEARCH -threads "$cores" \
+        -fastx_uniques "$output_dir/filtered_${i}.fastq" \
+        -fastaout "$output_dir/uniques_${i}.fasta" \
+        -sizeout
+
+    $USEARCH -threads "$cores" \
+        -minsize 2 \
+        -relabel OTU_ \
+        -cluster_otus "$output_dir/uniques_${i}.fasta" \
+        -otus "$output_dir/otus_${i}.fasta" \
+        -uparseout "$output_dir/uparse_otus_${i}.txt"
+
+    # Count stats
+    filt=$(grep -c "^@newstring" "$output_dir/filtered_${i}.fastq")
+    unique=$(grep -c "^>newstring" "$output_dir/uniques_${i}.fasta")
+    otu=$(grep -c "^>OTU" "$output_dir/otus_${i}.fasta")
+    echo -e "$i\t$filt\t$unique\t$otu" >> "$results_file"
+
+    # Cleanup
+    rm -f "$output_dir"/filtered_${i}.fastq \
+          "$output_dir"/uniques_${i}.fasta \
+          "$output_dir"/otus_${i}.fasta \
+          "$output_dir"/uparse_otus_${i}.txt
+done
+
+# -----------------------------------------------------------------------------
+# PLOTTING WITH R
+# -----------------------------------------------------------------------------
+echo -e "\n========== Plotting OTU number by read length ==========\n"
+module purge
+module load Miniforge3
+conda activate R
+cd "$output_dir"
+Rscript "$project_dir/code/testLength.R"
+conda deactivate
+
+# -----------------------------------------------------------------------------
+# SUMMARY
+# -----------------------------------------------------------------------------
+echo -e "\n========== Contents of $output_dir ==================\n"
+ls -lh "$output_dir"
+echo
+echo "Working directory: $(pwd)"
+
+# -----------------------------------------------------------------------------
+# SLURM LOG
+# -----------------------------------------------------------------------------
+echo -e "\n========== Sbatch log ==========\n"
+sacct -u "$USER" -j "$SLURM_JOB_ID" --format=JobID,JobName,Start,End,Elapsed,NCPUS,ReqMem
+scontrol show job "$SLURM_JOB_ID"
+
+# Move SLURM log to slurms folder
+mv "$project_dir"/code/slurm-"$SLURM_JOB_ID"* "$project_dir"/slurms/08_testLength-usearch.slurm 2>/dev/null || true

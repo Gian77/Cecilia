@@ -1,13 +1,13 @@
 # **Hi, I am Cecilia!**
 
-## *Cecilia v.1.0* - usear**C**h bas**E**d ampli**C**on p**I**pe**L**ine for **I**llumina d**A**ta<br> 
+## *Cecilia v.2.0* - usear**C**h bas**E**d ampli**C**on p**I**pe**L**ine for **I**llumina d**A**ta<br> 
 <br>
 
 ![Cecilia](images/cecilia.png)
 
 written by Gian M N Benucci, PhD<br>
 email: *benucci@msu.edu*<br>
-August 22, 2022
+July 25, 2025
 
 *This pipeline is based upon work supported by the Great Lakes Bioenergy Research Center, U.S. Department of Energy, Office of Science, Office of Biological and Environmental Research under award DE-SC0018409*
 
@@ -55,7 +55,7 @@ euk_db="/mnt/research/ShadeLab/Benucci/databases/unite_euk21/sh_general_dynamic_
 bac_db="/mnt/research/ShadeLab/Benucci/databases/silva_db138/SILVA_138_SSURef_tax_silva_bact_arch.fasta"
 
 isolates_fasta="/mnt/home/benucci/CONSTAX_v2/isolates_bonitolab2021.fasta"
-phix_db="/mnt/research/ShadeLab/Benucci/databases/phix_index/my_phix"
+
 ```
 #### Cecilia run-related mandatory parameters
 This below is an example of parameter for a Cecilia run. Before you fill this up there are impotant things to consider:
@@ -138,7 +138,6 @@ Useful links to lookup primers sequences:
 Please install via conda (or use the binaries in the HPPC) of all these software below
 * ##### [Fastqc](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/)
 * ##### [Cutadapt](https://cutadapt.readthedocs.io/en/stable/)
-* ##### [Bowtie2](https://bowtie-bio.sourceforge.net/bowtie2/index.shtml)
 * ##### [USEARCH](https://www.drive5.com/usearch/)
 * ##### [SWARM](https://github.com/torognes/swarm)
 * ##### [CONSTAX2](https://constax.readthedocs.io/en/latest/)

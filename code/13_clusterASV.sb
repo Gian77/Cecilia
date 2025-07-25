@@ -5,7 +5,7 @@
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=16
 #SBATCH --mem=128G
-#SBATCH --job-name=12_clusterUNOISE
+#SBATCH --job-name=13_clusterASV
 #SBATCH -A shade-cole-bonito
 
 set -euo pipefail
@@ -16,7 +16,7 @@ set -euo pipefail
 cat << 'EOF'
 ###############################################################################
 # Cecilia v.1.0 - usearCh basEd ampliCon pIpeLine for Illumina dAta
-# MIT LICENSE - Copyright © 2022 Gian M.N. Benucci, Ph.D.
+# MIT LICENSE - Copyright © 2025 Gian M.N. Benucci, Ph.D.
 # Email: benucci@msu.edu
 ###############################################################################
 EOF
@@ -28,7 +28,7 @@ cd "${SLURM_SUBMIT_DIR}"
 cores="${SLURM_CPUS_PER_TASK}"
 RAM="${SLURM_MEM_PER_NODE:-128000}"
 
-echo "===> Running script: 12_clusterUNOISE_usearch.sb"
+echo "===> Running script: 13_clusterASV.sb"
 
 # Load config
 source ../config.yaml
@@ -47,24 +47,23 @@ echo "Output directory: $output_dir"
 # -----------------------------------------------------------------------------
 # GENERATE ASVs AND BUILD OTU TABLE
 # -----------------------------------------------------------------------------
-cd "$input_dir"
-for file in unique*.fasta; do
+cd "$output_dir"
+for file in asv*.fasta; do
     [ -f "$file" ] || continue
     echo -e "\n========== Generating ASVs for $(basename "$file") ==========\n"
-    file_name=$(basename "$file" | cut -f2 -d"_" | cut -f1 -d".")
-
-    $USEARCH \
-        -unoise3 "$file" \
-        -minsize "$zotu_min_size" \
-        -tabbedout "$output_dir/unoise_asv_${file_name}.txt" \
-        -zotus "$output_dir/asv_${file_name}.fasta"
-
+    file_name=$(basename "$file")
+    base_name="${file_name%.fasta}"
+    
+    $USEARCH -sortbylength "$file" -fastaout "$output_dir/${base_name}_sorted.fasta"
+    $USEARCH -cluster_smallmem "$output_dir/${base_name}_sorted.fasta" -id "$cluster_asv_to_otu_id" \
+             -centroids "$output_dir/${base_name}_to97otus.fasta" \
+             -uc "$output_dir/${base_name}_to97otus.clust"
+    
     echo -e "\n========== Generating OTU table for $file_name ==========\n"
-    $USEARCH \
-        -threads "$cores" \
-        -otutab "$project_dir/outputs/06_primerStrip_cutadapt/pooled.fastq" \
-        -zotus "$output_dir/asv_${file_name}.fasta" \
-        -otutabout "$output_dir/asvtable_UNOISE_${file_name}.txt"
+    $USEARCH -threads "$cores" \
+             -otutab "$project_dir/outputs/06_primerStrip_cutadapt/pooled.fastq" \
+             -otus "$output_dir/${base_name}_to97otus.fasta" \
+             -otutabout "$output_dir/otutable_${base_name}_to97otus.txt"
 done
 
 # -----------------------------------------------------------------------------
@@ -82,4 +81,3 @@ echo -e "\n========= Sbatch log =========\n"
 sacct -u "$USER" -j "$SLURM_JOB_ID" --format=JobID,JobName,Start,End,Elapsed,NCPUS,ReqMem || true
 scontrol show job "$SLURM_JOB_ID" || true
 mv "$project_dir"/code/slurm-"$SLURM_JOB_ID"* "$project_dir"/slurms/12_clusterUNOISE_usearch.slurm
-

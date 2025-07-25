@@ -2,6 +2,9 @@
 
 Cecilia-results_*
 code/slurm-*.out
+code/.RData
+code/.Rhistory
+code/functions.sh
 rawdata/test_data/
 rawdata/*.fastq.gz
 rawdata/*.fastq
@@ -14,5 +17,7 @@ rawdata/*/
 
 outputs/
 slurms/
+stats/
 scripts/
 testing/
+code/temp/

@@ -5,73 +5,123 @@
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=16
 #SBATCH --mem=64G
-#SBATCH --job-name 0gunzip
+#SBATCH --job-name=01_decompress
 
-cd ${SLURM_SUBMIT_DIR}
-cores=$SLURM_CPUS_PER_TASK
-RAM=$SLURM_MEM_PER_NODE
+set -euo pipefail  # safer: exit on error, undefined vars, or broken pipes
 
-echo -e "Cecilia v.1.0 - usearCh basEd ampliCon pIpeLine for Illumina dAta
-MIT LICENSE - Copyright © 2022 Gian M.N. Benucci, Ph.D.
-email: benucci[at]msu[dot]edu\n"
+# -----------------------------------------------------------------------------
+# HEADER
+# -----------------------------------------------------------------------------
+cat << 'EOF'
+###############################################################################
+# Cecilia v.1.0 - usearCh basEd ampliCon pIpeLine for Illumina dAta
+# MIT License - Copyright © 2022 Gian M.N. Benucci, Ph.D.
+# Email: benucci@msu.edu
+###############################################################################
+EOF
 
+# -----------------------------------------------------------------------------
+# INIT
+# -----------------------------------------------------------------------------
+cd "${SLURM_SUBMIT_DIR}"
+cores=${SLURM_CPUS_PER_TASK}
+RAM=${SLURM_MEM_PER_NODE:-64000}  # default if not set
+
+echo "===> Running script: 01_decompress-bash.sb"
+
+# Source config
 source ../config.yaml
 
-echo -e "\n Running script: 01_decompress-bash.sb \n"
+# -----------------------------------------------------------------------------
+# SETUP DIRECTORIES
+# -----------------------------------------------------------------------------
+echo -e "\n========== Creating main project directories ==========\n"
 
-echo -e "\n========== Generating project sub-directories ==========\n"
-echo -e "mkdir $project_dir/outputs/\n `mkdir -p $project_dir/outputs/`
-	  mkdir $project_dir/slurms/\n `mkdir -p $project_dir/slurms/`
-	  \n"
-
-echo "cd $project_dir/rawdata"; cd $project_dir/rawdata
-
-echo -e "\n========== Decompress files ==========\n"
-for file in *.fastq*; do
-	if [[ $file == *.fastq.bz2 ]]; then echo -e "\n========== ${file} files are in fastq.bz2 format... ==========\n"
-			if [[ -f ${file%.*} ]]; then
-				echo -e "\n========== ${file} fastq.bz2 was already decompressed before! Skipping... ==========\n"
-			else 
-				echo -e "\n========== ${file} fastq.bz2 uncompressing... ==========\n"
-				bzip2 -cd < $file > ${file//.bz2/}
-			fi
-	elif [[ $file == *.fastq.gz ]]; then echo -e "\n========== ${file} files are in fastq.gz format... ==========\n"
-			if [[ -f ${file%.*} ]]; then
-				echo -e "\n========== ${file} fastq.gz was already decompressed before! Skipping... ==========\n"
-			else 
-				echo -e "\n========== ${file} fastq.gz uncompressing... ==========\n"
-				gzip -cd < $file > ${file//.gz/} 
-			fi 
-	elif [[ $file == *.fastq.tar.gz ]]; then echo -e "\n========== ${file} files are in fastq.tar.gz format... ==========\n"
-			if [[ -f ${file%.*} ]]; then
-				echo -e "\n========== ${file} fastq.tar.gz was already decompressed before! Skipping... ==========\n"
-			else 
-				echo -e "\n========== ${file} fastq.tar.gz uncompressing... ==========\n"
-				tar -czxvf < $file > ${file//.tar.gz/}
-			fi
-	elif [[ $file == *.fastq ]]; then 
-		echo -e "\n========== ${file} reads are in FASTQ format, nothing to do! ====================\n"
-	else 
-		echo -e "\n========== ${file} format non supported, this will not end up well... ==========\n"
-	fi
+for dir in "$project_dir/outputs" "$project_dir/slurms" "$project_dir/stats"; do
+    if [ ! -d "$dir" ]; then
+        echo "Creating directory: $dir"
+        mkdir -p "$dir"
+    else
+        echo "Directory already exists: $dir"
+    fi
 done
 
-echo -e "\n========== if contain 1.1 or 1.2, rename to standard R1 R2 format ==========\n"
-# Checks if the file has 1_1 or 1_2 before running
+# -----------------------------------------------------------------------------
+# DECOMPRESS FILES
+# -----------------------------------------------------------------------------
+cd "$project_dir/rawdata" || { echo "ERROR: Cannot cd into rawdata directory"; exit 1; }
+
+echo -e "\n========== Decompressing raw FASTQ files ==========\n"
+
+for file in *.fastq*; do
+    if [[ "$file" == *.fastq.bz2 ]]; then
+        echo -e "\n==> $file is in BZ2 format"
+        out_file="${file%.bz2}"
+        if [[ -f "$out_file" ]]; then
+            echo "   Skipping: already decompressed"
+        else
+            echo "   Decompressing..."
+            bzip2 -cd < "$file" > "$out_file"
+        fi
+
+    elif [[ "$file" == *.fastq.gz ]]; then
+        echo -e "\n==> $file is in GZ format"
+        out_file="${file%.gz}"
+        if [[ -f "$out_file" ]]; then
+            echo "   Skipping: already decompressed"
+        else
+            echo "   Decompressing..."
+            gzip -cd < "$file" > "$out_file"
+        fi
+
+    elif [[ "$file" == *.fastq.tar.gz ]]; then
+        echo -e "\n==> $file is in TAR.GZ format"
+        echo "   Note: .tar.gz is not supported by this step — skipping"
+        continue
+
+    elif [[ "$file" == *.fastq ]]; then
+        echo -e "\n==> $file is already in FASTQ format. Nothing to do."
+
+    else
+        echo -e "\n==> $file has unsupported format. Skipping."
+    fi
+done
+
+# -----------------------------------------------------------------------------
+# RENAME NON-STANDARD FILES (1_1 / 1_2 to R1 / R2)
+# -----------------------------------------------------------------------------
+shopt -s nullglob  # avoid literal pattern matching when no match is found
+rename_needed=false
+
 for file in *1_1.fastq; do
-	[ -f "$file" ] || continue
-	mv "$file" "${file//1_1.fastq/R1.fastq}"		
+    [ -f "$file" ] || continue
+    [ "$rename_needed" = false ] && echo -e "\n========== Renaming non-standard FASTQ filenames ==========\n" && rename_needed=true
+    new_name="${file//1_1.fastq/R1.fastq}"
+    echo "Renaming $file → $new_name"
+    mv "$file" "$new_name"
 done
 
 for file in *1_2.fastq; do
-	[ -f "$file" ] || continue
-	mv "$file" "${file//1_2.fastq/R2.fastq}"	
+    [ -f "$file" ] || continue
+    [ "$rename_needed" = false ] && echo -e "\n========== Renaming non-standard FASTQ filenames ==========\n" && rename_needed=true
+    new_name="${file//1_2.fastq/R2.fastq}"
+    echo "Renaming $file → $new_name"
+    mv "$file" "$new_name"
 done
 
-echo -e "The rawdata directory contains: \n`ls -l $project_dir/rawdata/`\n"
+# -----------------------------------------------------------------------------
+# SUMMARY
+# -----------------------------------------------------------------------------
+echo -e "\n========== Contents of "$project_dir/rawdata" ===================\n"
+ls -lh "$project_dir/rawdata"
+echo "Working directory: $(pwd) \n"
 
-echo -e "\n========== Sbatch log ==========\n"
-echo -e "\n Current directory: `pwd` \n"
-echo -e "\n `sacct -u $MSUusername -j $SLURM_JOB_ID --format=JobID,JobName,Start,End,Elapsed,NCPUS,ReqMem` \n"
-scontrol show job $SLURM_JOB_ID
-mv $project_dir/code/slurm-$SLURM_JOB_ID* $project_dir/slurms/01_decompress-bash.slurm
+# -----------------------------------------------------------------------------
+# SLURM JOB LOGGING
+# -----------------------------------------------------------------------------
+echo -e "\n========== SLURM Job Info ==========\n"
+sacct -u "$USER" -j "$SLURM_JOB_ID" --format=JobID,JobName,Start,End,Elapsed,NCPUS,ReqMem
+scontrol show job "$SLURM_JOB_ID"
+
+# Move SLURM log to slurms folder
+mv "$project_dir/code/slurm-$SLURM_JOB_ID"* "$project_dir/slurms/01_decompress-bash.slurm" 2>/dev/null || true

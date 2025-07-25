@@ -1,225 +1,176 @@
 #!/bin/bash -login
 
-#SBATCH --time=03:59:00
+#SBATCH --time=00:30:00
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=16
 #SBATCH --mem=32G
-#SBATCH --job-name 6cutadapt
-#SBACTH -A shade-cole-bonito
+#SBATCH --job-name=06_cutadapt
+#SBATCH -A glbrc
 
-cd ${SLURM_SUBMIT_DIR}
-cores=$SLURM_CPUS_PER_TASK
-RAM=$SLURM_MEM_PER_NODE
+set -euo pipefail
 
-echo -e "Cecilia v.1.0 - usearCh basEd ampliCon pIpeLine for Illumina dAta
-MIT LICENSE - Copyright © 2022 Gian M.N. Benucci, Ph.D.
-email: benucci[at]msu[dot]edu\n"
+# -----------------------------------------------------------------------------
+# HEADER
+# -----------------------------------------------------------------------------
+cat << 'EOF'
+###############################################################################
+# Cecilia v.1.0 - usearCh basEd ampliCon pIpeLine for Illumina dAta
+# MIT LICENSE - Copyright © 2022 Gian M.N. Benucci, Ph.D.
+# Email: benucci@msu.edu
+###############################################################################
+EOF
+
+# -----------------------------------------------------------------------------
+# INIT
+# -----------------------------------------------------------------------------
+cd "${SLURM_SUBMIT_DIR}"
+cores=${SLURM_CPUS_PER_TASK}
+RAM=${SLURM_MEM_PER_NODE:-32000}
+
+echo "===> Running script: 06_primerStrip-cutadapt.sb"
 
 source ../config.yaml
 
-echo -e "\n========== Sub-directories ==========\n"
-if [ -d $project_dir/outputs/06_primerStrip_cutadapt/ ]; then
-	echo -e "\n Directory exist! I performed this step already. Exiting... \n"
-else	
-	echo "mkdir $project_dir/outputs/06_primerStrip_cutadapt/"; mkdir $project_dir/outputs/06_primerStrip_cutadapt/
+# -----------------------------------------------------------------------------
+# SETUP DIRECTORIES
+# -----------------------------------------------------------------------------
+output_dir="$project_dir/outputs/06_primerStrip_cutadapt"
+slurm_dir="$project_dir/slurms"
+stats_dir="$project_dir/stats"
 
-	if [[ "$primers" == "yes" ]]; then
+echo -e "\n========== Creating necessary directories ==========\n"
+for dir in "$output_dir" "$stats_dir" "$slurm_dir"; do
+    if [ ! -d "$dir" ]; then
+        echo "Creating directory: $dir"
+        mkdir -p "$dir"
+    else
+        echo "Directory already exists: $dir"
+    fi
+done
 
-	echo -e "\n PCR primers are present in the reads... Removing them! \n"
-	
-		echo -e "\n========== Primer stripping... ==========\n"
-		if [[ "$assemble" == "yes" ]] && [[ "$rename" == "yes" ]]; then
-				source_dir=$project_dir/outputs/05_readRenamed_bash/
-				echo -e "\n You files were assembled and renamed! Data are in: \n $source_dir \n"
-				echo "cd $source_dir "; cd $source_dir/
-
-				conda activate cutadapt
-				echo "cutadapt version: `cutadapt --version`"	
-
-				for file in sample*.fastq; do
-				cutadapt \
-					-j $cores \
-					-g $fwd_primer \
-					-a $rev_primer_RC \
-					-e 0.01 \
-					-n 2 \
-					--discard-untrimmed \
-					--match-read-wildcards \
-					-o $project_dir/outputs/06_primerStrip_cutadapt/${file//.fastq/_stripped.fastq} $file
-				done
-				conda deactivate
-
-		elif [[ "$assemble" == "no" ]] && [[ "$rename" == "yes" ]]; then
-				source_dir=$project_dir/outputs/05_readRenamed_bash/
-				echo -e "\n You files were assembled and renamed! Data are in: \n $source_dir \n"
-				echo "cd $source_dir "; cd $source_dir/
-
-				# Picking the right adapter for R1 or R2
-				if [[ "$R2" == "yes" ]]; then
-					adapter=$rev_primer
-				else
-					adapter=$fwd_primer
-				fi
-
-				conda activate cutadapt
-				echo "cutadapt version: `cutadapt --version`"	
-
-				for file in sample*.fastq; do
-				cutadapt \
-					-j $cores \
-					-g $adapter \
-					-e 0.01 \
-					--discard-untrimmed \
-					--match-read-wildcards \
-					-o $project_dir/outputs/06_primerStrip_cutadapt/${file//.fastq/_stripped.fastq} $file
-				done
-				conda deactivate
-
-		elif [[ "$assemble" == "yes" ]] && [[ "$rename" == "no" ]]; then
-				source_dir=$project_dir/outputs/04_readAssembly_pear/
-				echo -e "\n You files were assembled but NOT renamed! Data are in: \n $source_dir \n"
-				echo "cd $source_dir "; cd $source_dir/
-
-				conda activate cutadapt
-				echo "cutadapt version: `cutadapt --version`"	
-
-				for file in *assembled.fastq; do 
-				cutadapt \
-					-j $cores \
-					-g $fwd_primer \
-					-a $rev_primer_RC \
-					-e 0.01 \
-					-n 2 \
-					--discard-untrimmed \
-					--match-read-wildcards \
-					-o $project_dir/outputs/06_primerStrip_cutadapt/${file//.fastq/_stripped.fastq} $file
-				done
-				conda deactivate
-
-		elif [[ "$assemble" == "no" ]] && [[ "$rename" == "no" ]]; then
-				source_dir=$project_dir/outputs/03_removePhix_bowtie2/
-				echo -e "\n You files were NOT assembled or renamed! Data are in: \n $source_dir \n"
-				echo "cd $source_dir "; cd $source_dir/
-
-				# Picking the right adapter for R1 or R2
-				if [[ "$R2" == "yes" ]]; then
-					adapter=$rev_primer
-				else
-					adapter=$fwd_primer
-				fi
-
-				conda activate cutadapt
-				echo "cutadapt version: `cutadapt --version`"	
-
-				for file in *nophix.fastq; do 
-				cutadapt \
-					-j $cores \
-					-g $adapter \
-					-e 0.01 \
-					--discard-untrimmed \
-					--match-read-wildcards \
-					-o $project_dir/outputs/06_primerStrip_cutadapt/${file//.fastq/_stripped.fastq} $file
-				done
-				conda deactivate
-		fi
-
-
-		echo -e "\n========== Extract a subset of reads for checking... ==========\n"
-		echo "cd $project_dir/outputs/06_primerStrip_cutadapt/"; cd $project_dir/outputs/06_primerStrip_cutadapt/
-			
-		cat $project_dir/outputs/06_primerStrip_cutadapt/*.fastq > $project_dir/outputs/06_primerStrip_cutadapt/pooled.fastq
-
-		conda activate seqtk 
-		seqtk sample -s100 $project_dir/outputs/06_primerStrip_cutadapt/pooled.fastq 500 > \
-					$project_dir/outputs/06_primerStrip_cutadapt/subset_500.fastq
-		seqtk seq -aQ64 $project_dir/outputs/06_primerStrip_cutadapt/subset_500.fastq > \
-					$project_dir/outputs/06_primerStrip_cutadapt/subset_500.fasta
-		conda deactivate
-
-		echo -e "\n========== Count stripped reads... ==========\n"
-		for fastq in *stripped.fastq; do 
-			echo "$fastq : `grep -c "^+$" $fastq`" 
-		done > $project_dir/outputs/06_primerStrip_cutadapt/stripped.counts
-
-	elif [[ "$primers" == "no" ]]; then 
-
-		echo -e "\n PCR primers are NOT present in the reads... Skipping! \n"
-
-
-		if [[ "$assemble" == "yes" ]] && [[ "$rename" == "yes" ]]; then
-
-			source_dir=$project_dir/outputs/05_readRenamed_bash/
-			cat $source_dir/sample* > $project_dir/outputs/06_primerStrip_cutadapt/pooled.fastq
-
-			conda activate seqtk 
-			seqtk sample -s100 $project_dir/outputs/06_primerStrip_cutadapt/pooled.fastq 500 > \
-						$project_dir/outputs/06_primerStrip_cutadapt/subset_500.fastq
-			seqtk seq -aQ64 $project_dir/outputs/06_primerStrip_cutadapt/subset_500.fastq > \
-						$project_dir/outputs/06_primerStrip_cutadapt/subset_500.fasta
-			conda deactivate
-
-			echo -e "\n========== Count renamed reads... ==========\n"
-			for fastq in $source_dir/sample*; do 
-				echo "$fastq : `grep -c "^+$" $fastq`" 
-			done > $project_dir/outputs/06_primerStrip_cutadapt/stripped.counts
-
-		elif [[ "$assemble" == "no" ]] && [[ "$rename" == "yes" ]]; then
-
-			source_dir=$project_dir/outputs/05_readRenamed_bash/
-			cat $source_dir/sample* > $project_dir/outputs/06_primerStrip_cutadapt/pooled.fastq
-
-			conda activate seqtk 
-			seqtk sample -s100 $project_dir/outputs/06_primerStrip_cutadapt/pooled.fastq 500 > \
-						$project_dir/outputs/06_primerStrip_cutadapt/subset_500.fastq
-			seqtk seq -aQ64 $project_dir/outputs/06_primerStrip_cutadapt/subset_500.fastq > \
-						$project_dir/outputs/06_primerStrip_cutadapt/subset_500.fasta
-			conda deactivate
-
-			echo -e "\n========== Count renamed reads... ==========\n"
-			for fastq in $source_dir/sample*; do 
-				echo "$fastq : `grep -c "^+$" $fastq`" 
-			done > $project_dir/outputs/06_primerStrip_cutadapt/stripped.counts
-
-		elif [[ "$assemble" == "yes" ]] && [[ "$rename" == "no" ]]; then
-			
-			source_dir=$project_dir/outputs/04_readAssembly_pear/
-			cat $source_dir/*assembled.fastq > $project_dir/outputs/06_primerStrip_cutadapt/pooled.fastq
-
-			conda activate seqtk 
-			seqtk sample -s100 $project_dir/outputs/06_primerStrip_cutadapt/pooled.fastq 500 > \
-						$project_dir/outputs/06_primerStrip_cutadapt/subset_500.fastq
-			seqtk seq -aQ64 $project_dir/outputs/06_primerStrip_cutadapt/subset_500.fastq > \
-						$project_dir/outputs/06_primerStrip_cutadapt/subset_500.fasta
-			conda deactivate
-
-			echo -e "\n========== Count renamed reads... ==========\n"
-			for fastq in $source_dir/*assembled.fastq; do 
-				echo "$fastq : `grep -c "^+$" $fastq`" 
-			done > $project_dir/outputs/06_primerStrip_cutadapt/stripped.counts
-
-		elif [[ "$assemble" == "no" ]] && [[ "$rename" == "no" ]]; then
-
-			source_dir=$project_dir/outputs/03_removePhix_bowtie2/
-			cat $source_dir/*nophix.fastq > $project_dir/outputs/06_primerStrip_cutadapt/pooled.fastq
-
-			conda activate seqtk 
-			seqtk sample -s100 $project_dir/outputs/06_primerStrip_cutadapt/pooled.fastq 500 > \
-						$project_dir/outputs/06_primerStrip_cutadapt/subset_500.fastq
-			seqtk seq -aQ64 $project_dir/outputs/06_primerStrip_cutadapt/subset_500.fastq > \
-						$project_dir/outputs/06_primerStrip_cutadapt/subset_500.fasta
-			conda deactivate
-
-			echo -e "\n========== Count renamed reads... ==========\n"
-			for fastq in $source_dir/*nophix.fastq; do 
-				echo "$fastq : `grep -c "^+$" $fastq`" 
-			done > $project_dir/outputs/06_primerStrip_cutadapt/stripped.counts
-		fi
-	fi
+# -----------------------------------------------------------------------------
+# SKIP IF ALREADY DONE
+# -----------------------------------------------------------------------------
+if compgen -G "$output_dir"/*stripped.fastq > /dev/null; then
+    echo -e "\nStripped files already exist. This step appears complete. Exiting.\n"
+    exit 0
 fi
 
-echo -e "\n========= Sbatch log =========\n"
-echo -e "\n Current directory: `pwd` \n"
-echo -e "\n `sacct -u $MSUusername -j $SLURM_JOB_ID --format=JobID,JobName,Start,End,Elapsed,NCPUS,ReqMem` \n"
-scontrol show job $SLURM_JOB_ID
-mv $project_dir/code/slurm-$SLURM_JOB_ID* $project_dir/slurms/06_primerStrip_cutadapt.slurm
+# -----------------------------------------------------------------------------
+# PRIMER STRIPPING
+# -----------------------------------------------------------------------------
+if [[ "$primers" == "yes" ]]; then
+    echo -e "\nPCR primers present from config options — proceeding with Cutadapt primer removal."
+
+    # Determine source directory
+    if [[ "$assemble" == "yes" && "$rename" == "yes" ]]; then
+        source_dir="$project_dir/outputs/05_readRenamed_bash"
+        pattern="sample*.fastq"
+        cutadapt_cmd=(cutadapt -g "$fwd_primer" -a "$rev_primer_RC" -n 2)
+    elif [[ "$assemble" == "no" && "$rename" == "yes" ]]; then
+        source_dir="$project_dir/outputs/05_readRenamed_bash"
+        pattern="sample*.fastq"
+        adapter=$([[ "$R2" == "yes" ]] && echo "$rev_primer" || echo "$fwd_primer")
+        cutadapt_cmd=(cutadapt -g "$adapter")
+    elif [[ "$assemble" == "yes" && "$rename" == "no" ]]; then
+        source_dir="$project_dir/outputs/04_readAssembly_usearch"
+        pattern="*assembled.fastq"
+        cutadapt_cmd=(cutadapt -g "$fwd_primer" -a "$rev_primer_RC" -n 2)
+    else
+        source_dir="$project_dir/outputs/03_removePhix_usearch"
+        pattern="*nophix.fastq"
+        adapter=$([[ "$R2" == "yes" ]] && echo "$rev_primer" || echo "$fwd_primer")
+        cutadapt_cmd=(cutadapt -g "$adapter")
+    fi
+
+    echo -e "\nUsing source: $source_dir\n"
+
+    cd "$source_dir"
+
+    module purge
+    module load Miniforge3
+
+    conda activate cutadapt
+    echo "Cutadapt version: $(cutadapt --version)"
+
+    for file in $pattern; do
+        out="$output_dir/${file%.fastq}_stripped.fastq"
+        echo "Processing: $file → $(basename "$out")"
+        "${cutadapt_cmd[@]}" \
+            -j "$cores" \
+            -e 0.01 \
+            --discard-untrimmed \
+            --match-read-wildcards \
+            -o "$out" "$file"
+    done
+
+    conda deactivate
+
+else
+    echo -e "\nPrimers are NOT present. Skipping Cutadapt and copying files as-is.\n"
+
+    if [[ "$assemble" == "yes" ]]; then
+        source_dir="$project_dir/outputs/04_readAssembly_usearch"
+        pattern="*assembled.fastq"
+    elif [[ "$rename" == "yes" ]]; then
+        source_dir="$project_dir/outputs/05_readRenamed_bash"
+        pattern="sample*.fastq"
+    else
+        source_dir="$project_dir/outputs/03_removePhix_usearch"
+        pattern="*nophix.fastq"
+    fi
+
+    for file in "$source_dir"/$pattern; do
+        cp "$file" "$output_dir/$(basename "${file%.fastq}_stripped.fastq")"
+    done
+fi
+
+# -----------------------------------------------------------------------------
+# CREATE FASTA SUBSET FOR QUALITY CONTROL
+# -----------------------------------------------------------------------------
+echo -e "\nCreating subset of 500 reads for QC..."
+
+pooled="$output_dir/pooled.fastq"
+subset="$output_dir/subset_500.fastq"
+subset_fasta="$output_dir/subset_500.fasta"
+
+cat "$output_dir"/*stripped.fastq > "$pooled"
+
+conda activate seqtk
+
+seqtk sample -s100 "$pooled" 500 > "$subset"
+seqtk seq -aQ64 "$subset" > "$subset_fasta"
+
+conda deactivate
+
+# -----------------------------------------------------------------------------
+# COUNT STRIPPED READS
+# -----------------------------------------------------------------------------
+echo -e "\n========== Counting primer-free reads ==========\n"
+count_file="$stats_dir/04.stripped.counts"
+> "$count_file"
+
+cd "$output_dir"
+for fastq in *stripped.fastq; do
+    [ -f "$fastq" ] || continue
+    count=$(grep -c "^+$" "$fastq")
+    echo "$fastq : $count" | tee -a "$count_file"
+done
+
+# -----------------------------------------------------------------------------
+# SUMMARY
+# -----------------------------------------------------------------------------
+echo -e "\n========== Contents of "$output_dir" ==================\n"
+ls -lh "$output_dir"
+echo
+echo "Working directory: $(pwd)"
+# -----------------------------------------------------------------------------
+# SLURM JOB LOGGING
+# -----------------------------------------------------------------------------
+echo -e "\n========= SLURM Job Info ==========\n"
+sacct -u "$USER" -j "$SLURM_JOB_ID" --format=JobID,JobName,Start,End,Elapsed,NCPUS,ReqMem
+scontrol show job "$SLURM_JOB_ID"
+
+mv "$project_dir/code/slurm-$SLURM_JOB_ID"* "$slurm_dir/06_primerStrip_cutadapt.slurm" 2>/dev/null || true
+
