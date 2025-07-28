@@ -1,6 +1,6 @@
 #!/bin/bash -login
 
-#SBATCH --time=00:59:00
+#SBATCH --time=03:59:00
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=16
@@ -58,6 +58,9 @@ for file in unique*.fasta; do
         -minsize "$zotu_min_size" \
         -tabbedout "$output_dir/unoise_asv_${file_name}.txt" \
         -zotus "$output_dir/asv_${file_name}.fasta"
+
+	awk '/^>/ {printf(">asv_%03d\n", ++i); next} {print}' "$output_dir/asv_${file_name}.fasta" > "$output_dir/asv_${file_name}.fasta.tmp"
+	mv "$output_dir/asv_${file_name}.fasta.tmp" "$output_dir/asv_${file_name}.fasta"
 
     echo -e "\n========== Generating OTU table for $file_name ==========\n"
     $USEARCH \

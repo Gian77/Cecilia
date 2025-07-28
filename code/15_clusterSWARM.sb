@@ -1,6 +1,6 @@
 #!/bin/bash -login
 
-#SBATCH --time=12:00:00
+#SBATCH --time=03:59:00
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=16
@@ -28,7 +28,7 @@ cd "${SLURM_SUBMIT_DIR}"
 cores="${SLURM_CPUS_PER_TASK}"
 RAM="${SLURM_MEM_PER_NODE:-64000}"
 
-echo "===> Running script: 15_clusterSWARM_swarm.sb"
+echo "===> Running script: 15_clusterSWARM.sb"
 
 # Load config
 source ../config.yaml
@@ -72,10 +72,12 @@ for file in *linear.fasta; do
     echo -e "\n========== Generating SWARM OTU table for $file_name ==========\n"
     $USEARCH \
         -threads "$cores" \
-        -relabel SWARM_ \
         -unoise3 "$output_dir/clusters_${file_name}.fasta" \
         -tabbedout "$output_dir/swarms_${file_name}.txt" \
         -zotus "$output_dir/swarms_${file_name}.fasta"
+
+	awk '/^>/ {printf(">asv_%03d\n", ++i); next} {print}' "$output_dir/swarms_${file_name}.fasta" > "$output_dir/swarms_${file_name}.fasta.tmp"
+	mv "$output_dir/swarms_${file_name}.fasta.tmp" "$output_dir/swarms_${file_name}.fasta"
 
      $USEARCH \
         -threads "$cores" \
@@ -102,4 +104,6 @@ echo "Working directory: $(pwd)"
 echo -e "\n========= Sbatch log =========\n"
 sacct -u "$USER" -j "$SLURM_JOB_ID" --format=JobID,JobName,Start,End,Elapsed,NCPUS,ReqMem" || true
 scontrol show job "$SLURM_JOB_ID" || true
-mv "$project_dir"/code/slurm-"$SLURM_JOB_ID"* "$project_dir"/slurms/13_clusterSWARMS_swarm3.slurm
+
+# Move SLURM log to slurms folder
+mv "$project_dir"/code/slurm-"$SLURM_JOB_ID"* "$project_dir"/slurms/13_clusterSWARMS_swarm3.slurm" 2>/dev/null || true

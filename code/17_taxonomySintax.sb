@@ -1,11 +1,11 @@
 #!/bin/bash -login
 
-#SBATCH --time=12:00:00
+#SBATCH --time=03:59:00
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=16
 #SBATCH --mem=64G
-#SBATCH --job-name=17_taxonomy
+#SBATCH --job-name=17_Sintax
 #SBATCH -A shade-cole-bonito
 
 set -euo pipefail
@@ -28,7 +28,7 @@ cd "${SLURM_SUBMIT_DIR}"
 cores="${SLURM_CPUS_PER_TASK}"
 RAM="${SLURM_MEM_PER_NODE:-64000}"
 
-echo "===> Running script: 17_taxonomy_sintax.sb"
+echo "===> Running script: 17_taxonomySintax.sb"
 
 # Load config
 source ../config.yaml
@@ -37,7 +37,7 @@ source ../config.yaml
 # SETUP DIRECTORIES
 # -----------------------------------------------------------------------------
 input_dir="$project_dir/outputs/11_clustered_otu_asv_usearch"
-output_dir="$project_dir/outputs/17_taxonomy_sintax"
+output_dir="$project_dir/outputs/13_taxonomy_sintax"
 mkdir -p "$output_dir"
 
 echo -e "\n========== Sub-directories ==========\n"
@@ -47,43 +47,45 @@ echo "Output directory: $output_dir"
 # -----------------------------------------------------------------------------
 # ASSIGN TAXONOMY BASED ON DNA MARKER
 # -----------------------------------------------------------------------------
-cd "$input_dir"
-
-if [[ "$DNAmarker" == "ITS" || "$DNAmarker" == "16S" ]]; then
-    # Decompress reference DB if needed
-    if file "$euk_db" | grep -q 'gzip compressed'; then
-        echo "Decompressing $euk_db"
-        gunzip "$euk_db"
-        euk_db="${euk_db%.gz}"
+echo -e "\n========== Check if to Decompress The $sintax_db database... ==========\n"
+if file "$sintax_db" | grep -q 'gzip compressed'; then
+    echo "DB is gzipped. Decompressing $sintax_db"
+    uncompressed="${sintax_db%.gz}"
+    if [ ! -f "$uncompressed" ]; then
+        gunzip "$sintax_db"
+        sintax_db="$uncompressed"
     else
-        echo "$euk_db is not gzipped. Continuing..."
+        echo "Uncompressed file $uncompressed already exists. Skipping decompression."
+        sintax_db="$uncompressed"
     fi
-
-    # Build database
-    echo -e "\n========== Building SINTAX database ==========\n"
-    $USEARCH \
-        -makeudb_usearch "$euk_db" \
-        -output "$output_dir/$(basename "${euk_db%.fasta}").udb"
-
-    # Assign taxonomy to each FASTA file
-    for file in *.fasta; do
-        [ -f "$file" ] || continue
-        echo -e "\n========== Assigning taxonomy for $(basename "$file") ==========\n"
-        file_name=$(basename "$file" .fasta)
-
-        $USEARCH \
-            -sintax "$file" \
-            -db "$output_dir/$(basename "${euk_db%.fasta}").udb" \
-            -tabbedout "$output_dir/${file_name}.sintax" \
-            -strand both \
-            -sintax_cutoff 0.8 \
-            -threads "$cores"
-    done
 else
-    echo "ERROR: Unsupported DNAmarker type '$DNAmarker'. Only 'ITS' and '16S' are allowed. 
-    If using a different marker modify 17_taxonomySintax.sb"
-    exit 1
+    echo "$sintax_db is not gzipped. Continuing..."
 fi
+
+# -----------------------------------------------------------------------------
+# BUILD SINTAX DATABASE
+# -----------------------------------------------------------------------------
+echo -e "\n========== Building SINTAX database ==========\n"
+$USEARCH \
+    -makeudb_usearch "$sintax_db" \
+    -output "$output_dir/$(basename "${sintax_db%.fasta}").udb"
+
+# -----------------------------------------------------------------------------
+# ASSIGN TAXONOMY TO EACH FASTA FILE
+# -----------------------------------------------------------------------------
+for file in "$input_dir"/*.fasta; do
+    [ -f "$file" ] || continue
+    echo -e "\n========== Assigning taxonomy for $(basename "$file") ==========\n"
+    file_name=$(basename "$file" .fasta)
+
+    $USEARCH \
+        -sintax "$file" \
+        -db "$output_dir/$(basename "${sintax_db%.fasta}").udb" \
+        -tabbedout "$output_dir/${file_name}.sintax" \
+        -strand both \
+        -sintax_cutoff 0.8 \
+        -threads "$cores"
+done
 
 # -----------------------------------------------------------------------------
 # SUMMARY
@@ -99,4 +101,6 @@ echo "Working directory: $(pwd)"
 echo -e "\n========= Sbatch log =========\n"
 sacct -u "$USER" -j "$SLURM_JOB_ID" --format=JobID,JobName,Start,End,Elapsed,NCPUS,ReqMem || true
 scontrol show job "$SLURM_JOB_ID" || true
-mv "$project_dir"/code/slurm-"$SLURM_JOB_ID"* "$project_dir"/slurms/17_taxonomy_sintax.slurm
+
+# Move SLURM log to slurms folder
+mv "$project_dir"/code/slurm-"$SLURM_JOB_ID"* "$project_dir"/slurms/17_taxonomySintax.slurm 2>/dev/null || true

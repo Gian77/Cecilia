@@ -28,7 +28,7 @@ cd "${SLURM_SUBMIT_DIR}"
 cores=${SLURM_CPUS_PER_TASK}
 RAM=${SLURM_MEM_PER_NODE:-32000}
 
-echo "===> Running script: 07_readTrimDemux-usearch.sb"
+echo "===> Running script: 07_readEEstats-usearch.sb"
 
 # Load config
 source ../config.yaml
@@ -135,4 +135,4 @@ echo "Working directory: $(pwd)"
 sacct -u "$USER" -j "$SLURM_JOB_ID" --format=JobID,JobName,Start,End,Elapsed,NCPUS,ReqMem
 scontrol show job "$SLURM_JOB_ID"
 
-mv "$project_dir/code/slurm-$SLURM_JOB_ID"* "$slurm_dir/07_readTrimDemux-usearch.slurm" 2>/dev/null || true
+mv "$project_dir/code/slurm-$SLURM_JOB_ID"* "$slurm_dir/07_readEEstats-usearch.slurm" 2>/dev/null || true
