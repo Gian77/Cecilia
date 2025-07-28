@@ -3,7 +3,7 @@
 ## *Cecilia v.2.0* - usear**C**h bas**E**d ampli**C**on p**I**pe**L**ine for **I**llumina d**A**ta<br> 
 <br>
 
-![Cecilia](images/cecilia.png width="50" height="50")
+<img src="images/cecilia.png" alt="Cecilia" width="50" height="50">
 
 written by Gian M N Benucci, PhD<br>
 email: *benucci@msu.edu*<br>
