@@ -97,16 +97,13 @@ fi
 # -----------------------------------------------------------------------------
 echo -e "\n========== Counting reads per sample ==========\n"
 
-count_file="$stats_dir/07_trimmed.counts"
-> "$count_file"
-
 if [ -f "$output_dir/trimmed.fastq" ]; then
     fastq_file="$output_dir/trimmed.fastq"
-    count_file="$stats_dir/07_trimmed.counts"
+    count_file="$stats_dir/6.trimmed.counts"
     echo "Using trimmed file: $fastq_file"
 else
     fastq_file="$input_dir/pooled.fastq"
-    count_file="$stats_dir/07_pooled.counts"
+    count_file="$stats_dir/5.pooled.counts"
     echo "Using pooled file: $fastq_file"
 fi
 

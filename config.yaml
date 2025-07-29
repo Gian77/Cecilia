@@ -20,8 +20,8 @@ project_dir="/mnt/home/benucci/Cecilia"
 DNAmarker=16S
 primers=yes
 R1=yes
-R2=yes
-assemble=yes
+R2=no
+assemble=no
 min_overlap=0
 rename=yes
 count_start=01
@@ -31,16 +31,16 @@ max_Eerr=1.0
 test_length=yes
 user_only=no
 user_length=400
-cluster_otu=yes
+cluster_otu=no
 otu_min_size=1
 closed_ref_otu=yes
 closedRef_db="/mnt/research/glbrc_group/benuccigmn/projects/project_Workshop16S/16S-Analysis-Playground/pipeline_USEARCH/closedref_db/closed_ref_seeds.fasta"
 cluster_asv=yes
 zotu_min_size=8
-cluster_asv_to_otu=yes
+cluster_asv_to_otu=yes # must include cluster_asv=yes
 cluster_asv_to_otu_id=0.97
 cluster_swarm=yes
-constax_taxonomy=yes
+constax_taxonomy=no
 sintax_taxonomy=yes
 # -----------------------------------------------------------------------------
 
@@ -68,8 +68,8 @@ constax_db="/mnt/home/benucci/DATABASES/SILVA/SILVA_138_SSURef_tax_silva_bact_ar
 # SINTAX PARAMETERs
 # -----------------------------------------------------------------------------
 # DATABASEs (comment not used)
-sintax_db="/mnt/research/glbrc_group/benuccigmn/projects/project_Workshop16S/16S-Analysis-Playground/pipeline_USEARCH/taxonomy_db/rdp_16s_v16.fa.gz"
-#sintax_db="/mnt/research/glbrc_group/benuccigmn//projects/project_Workshop16S/16S-Analysis-Playground/pipeline_USEARCH/taxonomy_db/ltp_16s_v123.fa.gz"
+#sintax_db="/mnt/research/glbrc_group/benuccigmn/projects/project_Workshop16S/16S-Analysis-Playground/pipeline_USEARCH/taxonomy_db/rdp_16s_v16.fa.gz"
+sintax_db="/mnt/research/glbrc_group/benuccigmn//projects/project_Workshop16S/16S-Analysis-Playground/pipeline_USEARCH/taxonomy_db/ltp_16s_v123.fa.gz"
 
 # -----------------------------------------------------------------------------
 # PCR PRIMERs (comment not used)

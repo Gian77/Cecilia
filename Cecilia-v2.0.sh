@@ -155,20 +155,24 @@ fi
 # -----------------------------------------------------------------------------
 echo -e "\n========== Assigning taxonomies ==========\n"
 
-deps=()
-[[ "$constax_taxonomy" == "yes" ]] && deps+=("$jid11" "$jid12" "$jid13" "$jid14")
-if (( ${#deps[@]} )); then
-    dep_string=$(IFS=":"; echo "${deps[*]}")
-    jid16=$(sbatch --dependency=afterok:$dep_string 16_taxonomyConstax.sb | cut -d" " -f 4)
-    echo "$jid16: Assigning taxonomy using CONSTAX2."
-fi
-
-deps=()
-[[ "$sintax_taxonomy" == "yes" ]] && deps+=("$jid11" "$jid12" "$jid13" "$jid14")
-if (( ${#deps[@]} )); then
-    dep_string=$(IFS=":"; echo "${deps[*]}")
-    jid17=$(sbatch --dependency=afterok:$dep_string 17_taxonomySintax.sb | cut -d" " -f 4)
-    echo "$jid17: Assigning taxonomy using USEARCH SINTAX."
+if [[ "$constax_taxonomy" == "yes" ]]; then
+    for jid in "$jid11" "$jid12" "$jid13" "$jid14"; do
+        if [[ -n "$jid" ]]; then
+            jid16=$(sbatch --dependency=afterok:$jid 16_taxonomyConstax.sb | cut -d" " -f 4)
+            echo "$jid16: Assigning taxonomy using CONSTAX2 (after $jid)."
+            break
+        fi
+    done
+elif [[ "$sintax_taxonomy" == "yes" ]]; then
+    for jid in "$jid11" "$jid12" "$jid13" "$jid14"; do
+        if [[ -n "$jid" ]]; then
+            jid17=$(sbatch --dependency=afterok:$jid 17_taxonomySintax.sb | cut -d" " -f 4)
+            echo "$jid17: Assigning taxonomy using USEARCH SINTAX (after $jid)."
+            break
+        fi
+    done
+else
+    echo "No taxonomy assignment selected (CONSTAX2 or SINTAX)."
 fi
 
 # -----------------------------------------------------------------------------

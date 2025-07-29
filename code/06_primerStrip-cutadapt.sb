@@ -148,7 +148,7 @@ conda deactivate
 # COUNT STRIPPED READS
 # -----------------------------------------------------------------------------
 echo -e "\n========== Counting primer-free reads ==========\n"
-count_file="$stats_dir/04.stripped.counts"
+count_file="$stats_dir/4.stripped.counts"
 > "$count_file"
 
 cd "$output_dir"

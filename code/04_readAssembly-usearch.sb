@@ -77,7 +77,7 @@ done < <(ls *.fastq) # use process substitution
 # -----------------------------------------------------------------------------
 echo -e "\n========== Counting assembled reads ==========\n"
 
-count_file="$stats_dir/03.assembled.counts"
+count_file="$stats_dir/3.assembled.counts"
 > "$count_file"
 
 cd "$output_dir" || exit 1
