@@ -28,7 +28,7 @@ cd "${SLURM_SUBMIT_DIR}"
 cores=${SLURM_CPUS_PER_TASK}
 RAM=${SLURM_MEM_PER_NODE:-32000}
 
-echo -e "\n===> Running script: 10_dereplicateReads_usearch.sb"
+echo -e "\n===> Running script: 10_dereplicateReads-usearch.sb"
 
 source ../config.yaml
 
@@ -117,4 +117,4 @@ sacct -u "$USER" -j "$SLURM_JOB_ID" --format=JobID,JobName,Start,End,Elapsed,NCP
 scontrol show job "$SLURM_JOB_ID"
 
 # Move SLURM log to slurms folder
-mv "$project_dir"/code/slurm-"$SLURM_JOB_ID"* "$project_dir"/slurms/10_dereplicateReads_usearch.slurm 2>/dev/null || true
+mv "$project_dir"/code/slurm-"$SLURM_JOB_ID"* "$project_dir"/slurms/10_dereplicateReads-usearch.slurm 2>/dev/null || true

@@ -35,16 +35,13 @@ for file in "$fastq_directory"/*.fastq; do
 	# Rename the file
 	mv "$file" "$fastq_directory/$new_name"
 	# Update read headers in the renamed file
-	awk -v new_prefix="$sample_name" \
-            -v count_start="$count" '
-            {
-                if (NR % 4 == 1) {
-                    header = sprintf("%s.%d", new_prefix, (NR + 3) / 4 + count_start - 1)
-                    printf "@" header "\n"
-                } else {
-                    print
-                }
-            }' "$fastq_directory/$new_name" > temp.fastq
+	awk -v new_prefix="$sample_name" '
+             { if (NR % 4 == 1) {
+                 read_count++
+                 printf "@%s.%d\n", new_prefix, read_count
+             } else {
+               print
+             } }' "$fastq_directory/$new_name" > temp.fastq
         mv temp.fastq "$fastq_directory/$new_name"
 	count=$((count + 1))
     fi

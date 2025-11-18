@@ -14,8 +14,8 @@ set -euo pipefail  # safer bash behavior
 # -----------------------------------------------------------------------------
 cat << 'EOF'
 ###############################################################################
-# Cecilia v.1.0 - usearCh basEd ampliCon pIpeLine for Illumina dAta
-# MIT License - Copyright © 2022 Gian M.N. Benucci, Ph.D.
+# Cecilia v.2.0 - usearCh basEd ampliCon pIpeLine for Illumina dAta
+# MIT License - Copyright © 2025 Gian M.N. Benucci, Ph.D.
 # Email: benucci@msu.edu
 ###############################################################################
 EOF
@@ -63,10 +63,14 @@ fi
 # -----------------------------------------------------------------------------
 cd "$rawdata_dir" || { echo "Error: Failed to cd into $rawdata_dir"; exit 1; }
 
+echo -e "\nWarning! If you fastq files have _R1_ and _R2_ as part of the actual 
+file name, or forward and reverse read files have just _1 and _2, then you should
+rename your files or change this script accrodingly."
+
 if [[ "$R1" == "yes" && "$R2" == "yes" ]]; then
     echo -e "\n========== Paired-end mode ==========\n"
 
-    ls *R[12]*fastq | sort > paired.list
+    ls *R[12]*.fastq > paired.list
 
     while read -r R1 && read -r R2; do
         echo -e "\nProcessing paired files: $R1 / $R2"
@@ -83,25 +87,34 @@ if [[ "$R1" == "yes" && "$R2" == "yes" ]]; then
 elif [[ "$R1" == "yes" && "$R2" == "no" ]]; then
     echo -e "\n========== Single-end R1-only mode ==========\n"
 
-    for file in *R1*fastq; do
+    ls *R1*.fastq > paired.list
+
+    for file in *R1*.fastq; do
         echo "Processing single-end R1: $file"
         "$USEARCH" \
             -filter_phix "$file" \
             -threads "$cores" \
             -output "$output_dir/${file%.fastq}_nophix.fastq" \
             -alnout "$output_dir/${file%.fastq}_nophix_hits.txt"
+
+    	rm "$output_dir/${file%.fastq}_nophix_hits.txt"
+
     done
 
 elif [[ "$R1" == "no" && "$R2" == "yes" ]]; then
     echo -e "\n========== Single-end R2-only mode ==========\n"
 
-    for file in *R2*fastq; do
+    ls *R2*.fastq > paired.list
+
+    for file in *R2*.fastq; do
         echo "Processing single-end R2: $file"
         "$USEARCH" \
             -filter_phix "$file" \
             -threads "$cores" \
             -output "$output_dir/${file%.fastq}_nophix.fastq" \
             -alnout "$output_dir/${file%.fastq}_nophix_hits.txt"
+
+        rm -alnout "$output_dir/${file%.fastq}_nophix_hits.txt"
     done
 
 else

@@ -39,10 +39,12 @@ source ../config.yaml
 input_dir="$project_dir/outputs/10_dereplicateReads_usearch"
 output_dir="$project_dir/outputs/11_clustered_otu_asv_usearch"
 mkdir -p "$output_dir"
+mkdir -p "$output_dir/extra"
 
 echo -e "\n========== Sub-directories ==========\n"
 echo "Input directory : $input_dir"
 echo "Output directory: $output_dir"
+echo "Extra files directory: $output_dir/extra"
 
 # -----------------------------------------------------------------------------
 # SWARM CLUSTERING AND OTU TABLE GENERATION
@@ -63,8 +65,8 @@ for file in *linear.fasta; do
         --fastidious \
         --usearch-abundance \
         --threads "$cores" \
-        --statistics-file "$output_dir/clusters_${file_name}_stats.txt" \
-        --seeds "$output_dir/clusters_${file_name}.fasta" \
+        --statistics-file "$output_dir/extra/clusters_${file_name}_stats.txt" \
+        --seeds "$output_dir/extra/clusters_${file_name}.fasta" \
         "$file" > /dev/null
 
     conda deactivate
@@ -72,11 +74,11 @@ for file in *linear.fasta; do
     echo -e "\n========== Generating SWARM OTU table for $file_name ==========\n"
     $USEARCH \
         -threads "$cores" \
-        -unoise3 "$output_dir/clusters_${file_name}.fasta" \
-        -tabbedout "$output_dir/swarms_${file_name}.txt" \
+        -unoise3 "$output_dir/extra/clusters_${file_name}.fasta" \
+        -tabbedout "$output_dir/extra/swarms_${file_name}.txt" \
         -zotus "$output_dir/swarms_${file_name}.fasta"
 
-	awk '/^>/ {printf(">asv_%03d\n", ++i); next} {print}' "$output_dir/swarms_${file_name}.fasta" > "$output_dir/swarms_${file_name}.fasta.tmp"
+	awk '/^>/ {printf(">swarm_%03d\n", ++i); next} {print}' "$output_dir/swarms_${file_name}.fasta" > "$output_dir/swarms_${file_name}.fasta.tmp"
 	mv "$output_dir/swarms_${file_name}.fasta.tmp" "$output_dir/swarms_${file_name}.fasta"
 
      $USEARCH \
@@ -85,9 +87,6 @@ for file in *linear.fasta; do
         -zotus "$output_dir/swarms_${file_name}.fasta" \
         -otutabout "$output_dir/otutable_SWARM_${file_name}.txt"
 
-    # Clean intermediate files
-    rm -f "$output_dir/clusters_${file_name}.fasta" \
-          "$output_dir/clusters_${file_name}_stats.txt"
 done
 
 # -----------------------------------------------------------------------------
@@ -102,8 +101,8 @@ echo "Working directory: $(pwd)"
 # LOG
 # -----------------------------------------------------------------------------
 echo -e "\n========= Sbatch log =========\n"
-sacct -u "$USER" -j "$SLURM_JOB_ID" --format=JobID,JobName,Start,End,Elapsed,NCPUS,ReqMem" || true
+sacct -u "$USER" -j "$SLURM_JOB_ID" --format=JobID,JobName,Start,End,Elapsed,NCPUS,ReqMem || true
+echo
 scontrol show job "$SLURM_JOB_ID" || true
-
 # Move SLURM log to slurms folder
-mv "$project_dir"/code/slurm-"$SLURM_JOB_ID"* "$project_dir"/slurms/13_clusterSWARMS_swarm3.slurm" 2>/dev/null || true
+mv "$project_dir"/code/slurm-"$SLURM_JOB_ID"* "$project_dir"/slurms/15_clusterSWARMS.slurm 2>/dev/null || true

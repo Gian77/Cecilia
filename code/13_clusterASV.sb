@@ -36,13 +36,15 @@ source ../config.yaml
 # -----------------------------------------------------------------------------
 # SETUP DIRECTORIES
 # -----------------------------------------------------------------------------
-output_dir="$project_dir/outputs/11_clustered_otu_asv_usearch"
 input_dir="$project_dir/outputs/10_dereplicateReads_usearch"
+output_dir="$project_dir/outputs/11_clustered_otu_asv_usearch"
 mkdir -p "$output_dir"
+mkdir -p "$output_dir/extra"
 
 echo -e "\n========== Sub-directories ==========\n"
 echo "Input directory : $input_dir"
 echo "Output directory: $output_dir"
+echo "Extra files directory: $output_dir/extra"
 
 # -----------------------------------------------------------------------------
 # GENERATE ASVs AND BUILD OTU TABLE
@@ -50,14 +52,17 @@ echo "Output directory: $output_dir"
 cd "$output_dir"
 for file in asv*.fasta; do
     [ -f "$file" ] || continue
+    # Skip already processed files
+    [[ "$file" == *"_to97otus.fasta" ]] && continue
+    
     echo -e "\n========== Generating ASVs for $(basename "$file") ==========\n"
     file_name=$(basename "$file")
     base_name="${file_name%.fasta}"
     
-    $USEARCH -sortbylength "$file" -fastaout "$output_dir/${base_name}_sorted.fasta"
-    $USEARCH -cluster_smallmem "$output_dir/${base_name}_sorted.fasta" -id "$cluster_asv_to_otu_id" \
+    $USEARCH -sortbylength "$file" -fastaout "$output_dir/extra/${base_name}_sorted.fasta"
+    $USEARCH -cluster_smallmem "$output_dir/extra/${base_name}_sorted.fasta" -id "$clustering_id" \
              -centroids "$output_dir/${base_name}_to97otus.fasta" \
-             -uc "$output_dir/${base_name}_to97otus.clust"
+             -uc "$output_dir/extra/${base_name}_to97otus.clust"
     
     echo -e "\n========== Generating OTU table for $file_name ==========\n"
     $USEARCH -threads "$cores" \
@@ -79,5 +84,7 @@ echo "Working directory: $(pwd)"
 # -----------------------------------------------------------------------------
 echo -e "\n========= Sbatch log =========\n"
 sacct -u "$USER" -j "$SLURM_JOB_ID" --format=JobID,JobName,Start,End,Elapsed,NCPUS,ReqMem || true
+echo
 scontrol show job "$SLURM_JOB_ID" || true
-mv "$project_dir"/code/slurm-"$SLURM_JOB_ID"* "$project_dir"/slurms/12_clusterUNOISE_usearch.slurm
+# Move SLURM log to slurms folder
+mv "$project_dir"/code/slurm-"$SLURM_JOB_ID"* "$project_dir"/slurms/13_clusterASV.slurm 2>/dev/null || true

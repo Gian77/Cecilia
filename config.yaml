@@ -17,31 +17,31 @@ project_dir="/mnt/home/benucci/Cecilia"
 # -----------------------------------------------------------------------------
 # CECILIA V2.0 PARAMETERS (default as below)
 # -----------------------------------------------------------------------------
-DNAmarker=16S
+DNAmarker=ITS
 primers=yes
 R1=yes
 R2=no
 assemble=no
 min_overlap=0
 rename=yes
-count_start=01
-stripleft=no
-stripleft_bp=0
+count_start=100
+stripleft=yes
+stripleft_bp=45
 max_Eerr=1.0
 test_length=yes
 user_only=no
-user_length=400
+user_length=180
 cluster_otu=no
 otu_min_size=1
-closed_ref_otu=yes
+closed_ref_otu=no
 closedRef_db="/mnt/research/glbrc_group/benuccigmn/projects/project_Workshop16S/16S-Analysis-Playground/pipeline_USEARCH/closedref_db/closed_ref_seeds.fasta"
-cluster_asv=yes
+cluster_asv=no
 zotu_min_size=8
 cluster_asv_to_otu=yes # must include cluster_asv=yes
-cluster_asv_to_otu_id=0.97
-cluster_swarm=yes
+clustering_id=0.97
+cluster_swarm=no
 constax_taxonomy=no
-sintax_taxonomy=yes
+sintax_taxonomy=no
 # -----------------------------------------------------------------------------
 
 # -----------------------------------------------------------------------------
@@ -50,18 +50,18 @@ sintax_taxonomy=yes
 # NOTE. constax2 public binaries https://github.com/liberjul/CONSTAXv2
 # PARAMETERs (mandatory)
 SINTAX=/mnt/research/glbrc_group/benuccigmn/TOOLS/usearch11.0.667_i86linux64
-RDP=/mnt/home/benucci/anaconda3/envs/constax2/share/rdptools-2.0.3-1/classifier
-CONSTAX=/mnt/home/benucci/anaconda3/envs/constax2/opt/constax-2.0.20-0
+RDP=/mnt/research/glbrc_group/benuccigmn/Miniforge3/envs/constax2/share/rdptools-2.0.3-1/classifier
+CONSTAX=/mnt/research/glbrc_group/benuccigmn/Miniforge3/envs/constax2/opt/constax-2.0.20-0
 train_db=yes
-trainfiles_euk="/mnt/home/benucci/DATABASES/UNITE/EUKARYOTES/trainfiles_unite040424"
-trainfiles_bac="/mnt/home/benucci/DATABASES/SILVA/trainfiles_silva138"
+#train_files="/mnt/research/glbrc_group/benuccigmn/DATABASES/UNITE/EUKARYOTES/trainfiles_unite_082025"
+train_files="/mnt/research/glbrc_group/benuccigmn/DATABASES/SILVA/trainfiles_silva_082025"
 constax_conf=0.7
 isolates_fasta="/mnt/home/benucci/CONSTAX_taxonomy/dbs/isolates_bonitolab2021.fasta"
 
 # DATABASEs (comment not used)
 #constax_db="/mnt/home/benucci/DATABASES/UNITE/EUKARYOTES/sh_general_release_dynamic_s_all_04.04.2024.fasta"
 #constax_db="/mnt/home/benucci/DATABASES/UNITE/FUNGI/sh_general_release_dynamic_s_04.04.2024.fasta"
-constax_db="/mnt/home/benucci/DATABASES/SILVA/SILVA_138_SSURef_tax_silva_bact_arch.fasta"
+constax_db="/mnt/research/glbrc_group/benuccigmn/DATABASES/SILVA/SILVA_138_SSURef_tax_silva_bact_arch.fasta"
 #isolate_fasta="/mnt/home/benucci/CONSTAX_taxonomy/dbs/SynCom_N40.fasta"
 
 # -----------------------------------------------------------------------------
@@ -69,7 +69,7 @@ constax_db="/mnt/home/benucci/DATABASES/SILVA/SILVA_138_SSURef_tax_silva_bact_ar
 # -----------------------------------------------------------------------------
 # DATABASEs (comment not used)
 #sintax_db="/mnt/research/glbrc_group/benuccigmn/projects/project_Workshop16S/16S-Analysis-Playground/pipeline_USEARCH/taxonomy_db/rdp_16s_v16.fa.gz"
-sintax_db="/mnt/research/glbrc_group/benuccigmn//projects/project_Workshop16S/16S-Analysis-Playground/pipeline_USEARCH/taxonomy_db/ltp_16s_v123.fa.gz"
+sintax_db="/mnt/research/glbrc_group/benuccigmn/projects/project_Workshop16S/16S-Analysis-Playground/pipeline_USEARCH/taxonomy_db/ltp_16s_v123.fa.gz"
 
 # -----------------------------------------------------------------------------
 # PCR PRIMERs (comment not used)
@@ -79,9 +79,9 @@ sintax_db="/mnt/research/glbrc_group/benuccigmn//projects/project_Workshop16S/16
 #rev_primer="AACACTCGCAYAYATGYTAGA" # amf rev primer
 #rev_primer_RC="TCTARCATRTRTGCGAGTGTT" # amf rev compl
 
-#fwd_primer="CTTGGTCATTTAGAGGAAGTAA" # ITS1F fwd primer (Gardes & Bruns 1993)
-#rev_primer="TCCTCCGCTTATTGATATGC" # ITS4 rev primer (White et al. 1990)
-#rev_primer_RC="GCATATCAATAAGCGGAGGA" # ITS4 rev compl
+fwd_primer="CTTGGTCATTTAGAGGAAGTAA" # ITS1F fwd primer (Gardes & Bruns 1993)
+rev_primer="TCCTCCGCTTATTGATATGC" # ITS4 rev primer (White et al. 1990)
+rev_primer_RC="GCATATCAATAAGCGGAGGA" # ITS4 rev compl
 
 #fwd_primer="CTTGGTCATTTAGAGGAAGTAA" # ITS1F fwd primer (White et al. 1990)
 #rev_primer="GCTGCGTTCTTCATCGATGC" # ITS2 rev primer (White et al. 1990)
@@ -96,9 +96,9 @@ sintax_db="/mnt/research/glbrc_group/benuccigmn//projects/project_Workshop16S/16
 #rev_primer_RC="AAGTCGTAACAAGGTAACC" # 1492R rev compl
 
 #fwd_primer="CCTACGGGNGGCWGCAG" # 341F fwd primer (Albersten et al., PLoS ONE. 2015;10:e0132783)
-fwd_primer="CCTACGGGAGGCAGCAG" # 341F fwd primer (Albersten et al., PLoS ONE. 2015;10:e0132783)
-rev_primer="GGACTACHVGGGTWTCTAAT" # 806R rev primer (Apprill et al., 2015. modified by Caporaso)
-rev_primer_RC="ATTAGAWACCCBDGTAGTCC" # 806R rev compl
+#fwd_primer="CCTACGGGAGGCAGCAG" # 341F fwd primer (Albersten et al., PLoS ONE. 2015;10:e0132783)
+#rev_primer="GGACTACHVGGGTWTCTAAT" # 806R rev primer (Apprill et al., 2015. modified by Caporaso)
+#rev_primer_RC="ATTAGAWACCCBDGTAGTCC" # 806R rev compl
 
 #fwd_primer="GGAAGTAAAAGTCGTAACAAGG" #ITS5-1737F Novogene primers for ITS
 #rev_primer="GCTGCGTTCTTCATCGATGC" #ITS2-2043R

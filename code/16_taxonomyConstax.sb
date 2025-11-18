@@ -1,9 +1,9 @@
 #!/bin/bash -login
 
-#SBATCH --time=00:59:00
+#SBATCH --time=12:00:00
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
-#SBATCH --cpus-per-task=32
+#SBATCH --cpus-per-task=16
 #SBATCH --mem=256G
 #SBATCH --job-name=12_clusterUNOISE
 #SBATCH -A shade-cole-bonito
@@ -40,12 +40,12 @@ echo -e "\n========== Setting up output directory ==========\n"
 output_dir="$project_dir/outputs/12_taxonomy_constax"
 input_dir="$project_dir/outputs/11_clustered_otu_asv_usearch"
 mkdir -p "$output_dir"
-
-cd "$input_dir"
+mkdir -p "$output_dir/extra"
 
 echo -e "\n========== Sub-directories ==========\n"
 echo "Input directory : $input_dir"
 echo "Output directory: $output_dir"
+echo "Extra files directory: $output_dir/extra"
 
 # -----------------------------------------------------------------------------
 # CONDA ENVIRONMENT
@@ -53,28 +53,33 @@ echo "Output directory: $output_dir"
 echo -e "\n========== Activating CONSTAX2 environment ==========\n"
 module purge
 module load Miniforge3
+set +u
 conda activate constax2
+set -u
 
 # -----------------------------------------------------------------------------
 # TRAIN DATABASE (IF REQUESTED)
 # -----------------------------------------------------------------------------
 if [[ "$train_db" == "yes" ]]; then
     echo -e "\n========== Training reference database $constax_db ==========\n"
-    first_file=$(ls otus*.fasta | head -1)
+    first_file=$(ls "$input_dir"/otus*.fasta | head -1)
     awk '/^>/ {n++} n>2 {exit} {print}' "$first_file" > "$output_dir/train.fasta"
 
-    constax \
-        --num_threads "$cores" \
-        --mem "$RAM" \
-        --db "$constax_db" \
-        --input "$output_dir/train.fasta" \
-        --train \
-        --trainfile "$trainfiles_euk/" \
-        --output "$output_dir/" \
-        --blast \
-        --sintax_path "$SINTAX" \
-        --rdp_path "$RDP" \
-        --constax_path "$CONSTAX"
+    (
+        cd "$output_dir"
+        constax \
+            --num_threads "$cores" \
+            --mem "$RAM" \
+            --db "$constax_db" \
+            --input train.fasta \
+            --train \
+            --trainfile "$train_files/" \
+            --output ./ \
+            --blast \
+            --sintax_path "$SINTAX" \
+            --rdp_path "$RDP" \
+            --constax_path "$CONSTAX"
+    )
 else
     echo -e "Using pre-trained reference database. Skipping training step."
 fi
@@ -84,41 +89,39 @@ echo -e "\nTraining files:\n$(ls -l "$trainfiles_euk/")"
 # -----------------------------------------------------------------------------
 # TAXONOMY ASSIGNMENT
 # -----------------------------------------------------------------------------
-for file in *.fasta; do
+for file in "$input_dir"/*.fasta; do
     [ -f "$file" ] || continue
-    echo -e "\n========== Assigning taxonomy for $file ==========\n"
-    file_name="${file%%.*}"
+    echo -e "\n$file\n"
+    file_base=$(basename "$file")
+    file_name="${file_base%%.*}"
 
-    constax \
-        --num_threads "$cores" \
-        --mem "$RAM" \
-        --db "$euk_db" \
-        --trainfile "$trainfiles_euk/" \
-        --input "$file" \
-        --isolates "$bonito_isolates" \
-        --isolates_query_coverage 90 \
-        --isolates_percent_identity 90 \
-        --high_level_db "$euk_db" \
-        --high_level_query_coverage 60 \
-        --high_level_percent_identity 60 \
-        --tax "$output_dir/constax_${file_name}/" \
-        --output "$output_dir/constax_${file_name}/" \
-        --conf "$constax_conf" \
-        --blast \
-        --sintax_path "$SINTAX" \
-        --rdp_path "$RDP" \
-        --constax_path "$CONSTAX"
+    echo -e "\n========== Assigning taxonomy for $file_base ==========\n"
+
+    (
+        cd "$output_dir"
+        constax \
+            --num_threads "$cores" \
+            --mem "$RAM" \
+            --db "$euk_db" \
+            --trainfile "$train_files/" \
+            --input "$file" \
+            --isolates "$bonito_isolates" \
+            --isolates_query_coverage 90 \
+            --isolates_percent_identity 90 \
+            --high_level_db "$euk_db" \
+            --high_level_query_coverage 60 \
+            --high_level_percent_identity 60 \
+            --tax "constax_${file_name}/" \
+            --output "constax_${file_name}/" \
+            --conf "$constax_conf" \
+            --blast \
+            --sintax_path "$SINTAX" \
+            --rdp_path "$RDP" \
+            --constax_path "$CONSTAX"
+    )
 done
 
 conda deactivate
-
-# -----------------------------------------------------------------------------
-# MOVE LOG FILES
-# -----------------------------------------------------------------------------
-echo -e "\n========== Moving CONSTAX2 logs ==========\n"
-mv "$input_dir"/log_constax2* "$output_dir/" 2>/dev/null || true
-mv "$input_dir"/ver_python.txt "$output_dir/" 2>/dev/null || true
-mv "$input_dir"/rdp_train.out "$output_dir/" 2>/dev/null || true
 
 # -----------------------------------------------------------------------------
 # SUMMARY
@@ -127,14 +130,12 @@ echo -e "\n========== Contents of $output_dir ==================\n"
 ls -lh "$output_dir"
 echo
 echo "Working directory: $(pwd)"
-
 # -----------------------------------------------------------------------------
 # SLURM LOG
 # -----------------------------------------------------------------------------
 echo -e "\n========= SLURM Job Info ========="
-echo -e "\nCurrent directory: $(pwd)\n"
-echo -e "\n$(sacct -u "$MSUusername" -j "$SLURM_JOB_ID" --format=JobID,JobName,Start,End,Elapsed,NCPUS,ReqMem)\n"
-scontrol show job "$SLURM_JOB_ID"
-
+echo -e "\n$(sacct -u "$MSUusername" -j "$SLURM_JOB_ID" --format=JobID,JobName,Start,End,Elapsed,NCPUS,ReqMem)\n" || true
+echo
+scontrol show job "$SLURM_JOB_ID" || true
 # Move SLURM log to slurms folder
 mv "$project_dir/code/slurm-$SLURM_JOB_ID"* "$project_dir/slurms/14.1_EukTaxonomy_OTU_constax.slurm" 2>/dev/null || true

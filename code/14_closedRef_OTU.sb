@@ -39,10 +39,12 @@ source ../config.yaml
 output_dir="$project_dir/outputs/11_clustered_otu_asv_usearch"
 input_dir="$project_dir/outputs/10_dereplicateReads_usearch"
 mkdir -p "$output_dir"
+mkdir -p "$output_dir/extra"
 
 echo -e "\n========== Sub-directories ==========\n"
 echo "Input directory : $input_dir"
 echo "Output directory: $output_dir"
+echo "Extra files directory: $output_dir/extra"
 
 # -----------------------------------------------------------------------------
 # GENERATE CLOSERD REFERENCE OTUs
@@ -60,14 +62,13 @@ for file in "$input_dir"/*.fasta; do
     echo -e "\n========== Closed reference OTUs for $(basename "$file") ==========\n"
     file_name=$(basename "$file" | cut -f2 -d"_" | cut -f1 -d".")
 
-
    $USEARCH \
       -closed_ref "$file" \
-      -id 0.97 \
+      -id "$clustering_id" \
       -db "$closedRef_db" \
       -strand both \
       -otutabout "$output_dir/otutable_${file_name}_closedRef.txt" \
-      -tabbedout "$output_dir/otutable_${file_name}_closedRef.tabbed"
+      -tabbedout "$output_dir/extra/otutable_${file_name}_closedRef.tabbed"
 done
 
 # -----------------------------------------------------------------------------
@@ -83,5 +84,7 @@ echo "Working directory: $(pwd)"
 # -----------------------------------------------------------------------------
 echo -e "\n========= Sbatch log =========\n"
 sacct -u "$USER" -j "$SLURM_JOB_ID" --format=JobID,JobName,Start,End,Elapsed,NCPUS,ReqMem || true
+echo
 scontrol show job "$SLURM_JOB_ID" || true
-mv "$project_dir"/code/slurm-"$SLURM_JOB_ID"* "$project_dir"/slurms/14_closedRef_OTU.slurm
+# Move SLURM log to slurms folder
+mv "$project_dir"/code/slurm-"$SLURM_JOB_ID"* "$project_dir"/slurms/14_closedRef_OTU.slurm 2>/dev/null || true

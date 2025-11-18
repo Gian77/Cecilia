@@ -39,10 +39,13 @@ source ../config.yaml
 output_dir="$project_dir/outputs/11_clustered_otu_asv_usearch"
 input_dir="$project_dir/outputs/10_dereplicateReads_usearch"
 mkdir -p "$output_dir"
+mkdir -p "$output_dir/extra"
 
 echo -e "\n========== Sub-directories ==========\n"
 echo "Input directory : $input_dir"
 echo "Output directory: $output_dir"
+echo "Extra files directory: $output_dir/extra"
+
 
 # -----------------------------------------------------------------------------
 # CLUSTER OTUs AND BUILD OTU TABLE
@@ -57,7 +60,7 @@ for file in "$input_dir"/*.fasta; do
         -relabel otu_ \
         -cluster_otus "$file" \
         -otus "$output_dir/otus_${file_name}.fasta" \
-        -uparseout "$output_dir/uparse_otus_${file_name}.txt"
+        -uparseout "$output_dir/extra/uparse_otus_${file_name}.txt"
 
     echo -e "\n========== Generating OTU table for $file_name ==========\n"
     $USEARCH \

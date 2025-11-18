@@ -1,10 +1,10 @@
 #!/bin/bash -login
 
-#SBATCH --time=14:00:00
+#SBATCH --time=03:59:00
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
-#SBATCH --cpus-per-task=32
-#SBATCH --mem=64G
+#SBATCH --cpus-per-task=16
+#SBATCH --mem=128G
 #SBATCH --job-name 08_testlength
 #SBATCH -A shade-cole-bonito
 
@@ -26,7 +26,7 @@ EOF
 # -----------------------------------------------------------------------------
 cd "${SLURM_SUBMIT_DIR}"
 cores=${SLURM_CPUS_PER_TASK}
-RAM=${SLURM_MEM_PER_NODE:-32000}
+RAM=${SLURM_MEM_PER_NODE:-128000}
 
 echo "===> Running script: 08_testLength-usearch.sb"
 
@@ -77,12 +77,22 @@ else
     echo -e "\nUsing non-trimmed reads at: $source_file\n"
 fi
 
-# Initialize results file
+# Initialize results file with zeros
 results_file="$output_dir/testLength.results"
-echo -e "Length\tFiltered\tUniques\tOtus" > "$results_file"
+if [[ ! -s "$results_file" ]]; then
+    header=$(echo -e "Length\tFiltered\tUniques\tOtus")
+    echo "$header" > "$results_file"
+fi
+
+#echo -e "Length\tFiltered\tUniques\tOtus" > "$results_file"
+#for i in $(seq -w 150 300); do
+#    echo -e "$i\t0\t0\t0" >> "$results_file"
+#done
 
 # Loop over sequence lengths
 for i in $(seq -w 150 300); do
+    
+    echo -e "\nMain command: -fastq_maxee $i \n"
     $USEARCH -threads "$cores" \
         -fastq_filter "$source_file" \
         -fastq_maxee "$max_Eerr" \
@@ -91,26 +101,37 @@ for i in $(seq -w 150 300); do
         -fastq_maxns 0 \
         -fastqout "$output_dir/filtered_${i}.fastq"
 
+    # Check if filtered file is empty and skip if so
+    if [[ ! -s "$output_dir/filtered_${i}.fastq" ]]; then
+        echo "Warning: No reads passed filter for length $i. Skipping clustering..."
+        echo -e "$i\t0\t0\t0" >> "$results_file"
+        rm -f "$output_dir/filtered_${i}.fastq"
+        continue
+    fi
+
+    echo -e "\nMain command: -fastx_uniques \n"
     $USEARCH -threads "$cores" \
         -fastx_uniques "$output_dir/filtered_${i}.fastq" \
         -fastaout "$output_dir/uniques_${i}.fasta" \
         -sizeout
-
+        
+    echo -e "\nMain command: -cluster_otus \n"
     $USEARCH -threads "$cores" \
         -minsize 2 \
-        -relabel OTU_ \
+        -relabel otu_ \
         -cluster_otus "$output_dir/uniques_${i}.fasta" \
         -otus "$output_dir/otus_${i}.fasta" \
         -uparseout "$output_dir/uparse_otus_${i}.txt"
 
-    # Count stats
+    # Count and update stats
     filt=$(grep -c "^@newstring" "$output_dir/filtered_${i}.fastq")
     unique=$(grep -c "^>newstring" "$output_dir/uniques_${i}.fasta")
-    otu=$(grep -c "^>OTU" "$output_dir/otus_${i}.fasta")
+    otu=$(grep -c "^>otu" "$output_dir/otus_${i}.fasta")
+    sed -i "/^$i\t/d" "$results_file"
     echo -e "$i\t$filt\t$unique\t$otu" >> "$results_file"
 
     # Cleanup
-    rm -f "$output_dir"/filtered_${i}.fastq \
+    rm -f "$output_dir/filtered_${i}.fastq" \
           "$output_dir"/uniques_${i}.fasta \
           "$output_dir"/otus_${i}.fasta \
           "$output_dir"/uparse_otus_${i}.txt

@@ -57,24 +57,57 @@ fi
 echo -e "\n========== Filtering with max expected error = $max_Eerr ==========\n"
 
 for len in 200 225 250; do
+    out_file="$output_dir/filtered_${len}bp.fastq"
+
     $USEARCH -fastq_filter "$source_file" \
         -fastq_maxee "$max_Eerr" \
         -fastq_trunclen "$len" \
         -fastq_maxns 0 \
-        -fastqout "$output_dir/filtered_${len}bp.fastq"
+        -fastqout "$out_file"
+
+    # Remove the output file if it is empty (no reads passed)
+    if [[ ! -s "$out_file" ]]; then
+        echo "Warning: No reads passed filter for length $len. Removing empty file: $out_file"
+        rm -f "$out_file"
+    fi
 done
 
+#for len in 200 225 250; do
+#    $USEARCH -fastq_filter "$source_file" \
+#        -fastq_maxee "$max_Eerr" \
+#        -fastq_trunclen "$len" \
+#        -fastq_maxns 0 \
+#        -fastqout "$output_dir/filtered_${len}bp.fastq"
+#done
+
 # Optional user-defined length
+#if [[ -v user_length && "$user_length" =~ ^[0-9]+$ ]]; then
+#    echo -e "\nFiltering with user-defined length: $user_length bp\n"
+#    $USEARCH -fastq_filter "$source_file" \
+#        -fastq_maxee "$max_Eerr" \
+#       -fastq_trunclen "$user_length" \
+#        -fastq_maxns 0 \
+#        -fastqout "$output_dir/filtered_${user_length}bp.fastq"
+#else
+#    echo -e "\nNo valid user_length defined in config.yaml. Skipping custom length...\n"
+#fi
+
 if [[ -v user_length && "$user_length" =~ ^[0-9]+$ ]]; then
     echo -e "\nFiltering with user-defined length: $user_length bp\n"
+    out_file="$output_dir/filtered_${user_length}bp.fastq"
+
     $USEARCH -fastq_filter "$source_file" \
         -fastq_maxee "$max_Eerr" \
         -fastq_trunclen "$user_length" \
         -fastq_maxns 0 \
-        -fastqout "$output_dir/filtered_${user_length}bp.fastq"
-else
-    echo -e "\nNo valid user_length defined in config.yaml. Skipping custom length...\n"
+        -fastqout "$out_file"
+
+    if [[ ! -s "$out_file" ]]; then
+        echo "Warning: No reads passed filter for user-defined length $user_length. Removing empty file: $out_file"
+        rm -f "$out_file"
+    fi
 fi
+
 
 # -----------------------------------------------------------------------------
 # FINAL QUALITY CHECK WITH FASTQC

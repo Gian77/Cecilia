@@ -39,11 +39,12 @@ source ../config.yaml
 output_dir="$project_dir/outputs/11_clustered_otu_asv_usearch"
 input_dir="$project_dir/outputs/10_dereplicateReads_usearch"
 mkdir -p "$output_dir"
+mkdir -p "$output_dir/extra"
 
 echo -e "\n========== Sub-directories ==========\n"
 echo "Input directory : $input_dir"
 echo "Output directory: $output_dir"
-
+echo "Extra files directory: $output_dir/extra"
 # -----------------------------------------------------------------------------
 # GENERATE ASVs AND BUILD OTU TABLE
 # -----------------------------------------------------------------------------
@@ -56,7 +57,7 @@ for file in unique*.fasta; do
     $USEARCH \
         -unoise3 "$file" \
         -minsize "$zotu_min_size" \
-        -tabbedout "$output_dir/unoise_asv_${file_name}.txt" \
+        -tabbedout "$output_dir/extra/unoise_asv_${file_name}.txt" \
         -zotus "$output_dir/asv_${file_name}.fasta"
 
 	awk '/^>/ {printf(">asv_%03d\n", ++i); next} {print}' "$output_dir/asv_${file_name}.fasta" > "$output_dir/asv_${file_name}.fasta.tmp"
@@ -69,7 +70,6 @@ for file in unique*.fasta; do
         -zotus "$output_dir/asv_${file_name}.fasta" \
         -otutabout "$output_dir/asvtable_UNOISE_${file_name}.txt"
 done
-
 # -----------------------------------------------------------------------------
 # SUMMARY
 # -----------------------------------------------------------------------------
@@ -77,12 +77,12 @@ echo -e "\n========== Contents of $output_dir ==================\n"
 ls -lh "$output_dir"
 echo
 echo "Working directory: $(pwd)"
-
 # -----------------------------------------------------------------------------
 # LOG
 # -----------------------------------------------------------------------------
 echo -e "\n========= Sbatch log =========\n"
 sacct -u "$USER" -j "$SLURM_JOB_ID" --format=JobID,JobName,Start,End,Elapsed,NCPUS,ReqMem || true
+echo
 scontrol show job "$SLURM_JOB_ID" || true
-mv "$project_dir"/code/slurm-"$SLURM_JOB_ID"* "$project_dir"/slurms/12_clusterUNOISE_usearch.slurm
-
+# Move SLURM log to slurms folder
+mv "$project_dir"/code/slurm-"$SLURM_JOB_ID"* "$project_dir"/slurms/12_clusterUNOISE_usearch.slurm 2>/dev/null || true
