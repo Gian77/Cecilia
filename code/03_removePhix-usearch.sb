@@ -36,7 +36,7 @@ source ../config.yaml
 # SETUP DIRECTORIES
 # -----------------------------------------------------------------------------
 output_dir="$project_dir/outputs/03_removePhix_usearch"
-rawdata_dir="$project_dir/rawdata"
+input_dir="$project_dir/outputs/01_decompressed"
 slurm_dir="$project_dir/slurms"
 stats_dir="$project_dir/stats"
 
@@ -61,7 +61,7 @@ fi
 # -----------------------------------------------------------------------------
 # PHIX FILTERING
 # -----------------------------------------------------------------------------
-cd "$rawdata_dir" || { echo "Error: Failed to cd into $rawdata_dir"; exit 1; }
+cd "$input_dir" || { echo "Error: Failed to cd into $input_dir"; exit 1; }
 
 echo -e "\nWarning! If you fastq files have _R1_ and _R2_ as part of the actual 
 file name, or forward and reverse read files have just _1 and _2, then you should
@@ -148,6 +148,4 @@ echo "Working directory: $(pwd)"
 echo -e "\n========== SLURM Job Info ==========\n"
 sacct -u "$USER" -j "$SLURM_JOB_ID" --format=JobID,JobName,Start,End,Elapsed,NCPUS,ReqMem
 scontrol show job "$SLURM_JOB_ID"
-
 mv "$project_dir/code/slurm-$SLURM_JOB_ID"* "$slurm_dir/03_removePhix-usearch.slurm" 2>/dev/null || true
-

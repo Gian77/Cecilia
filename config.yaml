@@ -17,31 +17,30 @@ project_dir="/mnt/home/benucci/Cecilia"
 # -----------------------------------------------------------------------------
 # CECILIA V2.0 PARAMETERS (default as below)
 # -----------------------------------------------------------------------------
-DNAmarker=ITS
+DNAmarker=16S
 primers=yes
 R1=yes
 R2=no
 assemble=no
 min_overlap=0
 rename=yes
-count_start=100
-stripleft=yes
-stripleft_bp=45
+count_start=01
+stripleft=no
+stripleft_bp=0
 max_Eerr=1.0
 test_length=yes
 user_only=no
-user_length=180
-cluster_otu=no
+user_length=233
+cluster_otu=yes
 otu_min_size=1
-closed_ref_otu=no
-closedRef_db="/mnt/research/glbrc_group/benuccigmn/projects/project_Workshop16S/16S-Analysis-Playground/pipeline_USEARCH/closedref_db/closed_ref_seeds.fasta"
-cluster_asv=no
+closed_ref_otu=yes # if yes must specify database below
+cluster_asv=yes
 zotu_min_size=8
-cluster_asv_to_otu=yes # must include cluster_asv=yes
+cluster_asv_to_otu=yes  # must include cluster_asv=yes
 clustering_id=0.97
-cluster_swarm=no
-constax_taxonomy=no
-sintax_taxonomy=no
+cluster_swarm=yes
+constax_taxonomy=yes
+sintax_taxonomy=yes
 # -----------------------------------------------------------------------------
 
 # -----------------------------------------------------------------------------
@@ -69,7 +68,9 @@ constax_db="/mnt/research/glbrc_group/benuccigmn/DATABASES/SILVA/SILVA_138_SSURe
 # -----------------------------------------------------------------------------
 # DATABASEs (comment not used)
 #sintax_db="/mnt/research/glbrc_group/benuccigmn/projects/project_Workshop16S/16S-Analysis-Playground/pipeline_USEARCH/taxonomy_db/rdp_16s_v16.fa.gz"
-sintax_db="/mnt/research/glbrc_group/benuccigmn/projects/project_Workshop16S/16S-Analysis-Playground/pipeline_USEARCH/taxonomy_db/ltp_16s_v123.fa.gz"
+sintax_db="/mnt/research/glbrc_group/benuccigmn/DATABASES/SILVA/SILVA_138_SSURef_tax_silva_bact_arch.fasta"
+#closedRef_db="/mnt/research/glbrc_group/benuccigmn/DATABASES/CLOSED_REF_DBs/closed_ref_seeds.fasta"
+closedRef_db="/mnt/research/glbrc_group/benuccigmn/DATABASES/CLOSED_REF_DBs/syncom_n40_ref_seeds.fasta"
 
 # -----------------------------------------------------------------------------
 # PCR PRIMERs (comment not used)
@@ -79,9 +80,9 @@ sintax_db="/mnt/research/glbrc_group/benuccigmn/projects/project_Workshop16S/16S
 #rev_primer="AACACTCGCAYAYATGYTAGA" # amf rev primer
 #rev_primer_RC="TCTARCATRTRTGCGAGTGTT" # amf rev compl
 
-fwd_primer="CTTGGTCATTTAGAGGAAGTAA" # ITS1F fwd primer (Gardes & Bruns 1993)
-rev_primer="TCCTCCGCTTATTGATATGC" # ITS4 rev primer (White et al. 1990)
-rev_primer_RC="GCATATCAATAAGCGGAGGA" # ITS4 rev compl
+#fwd_primer="CTTGGTCATTTAGAGGAAGTAA" # ITS1F fwd primer (Gardes & Bruns 1993)
+#rev_primer="TCCTCCGCTTATTGATATGC" # ITS4 rev primer (White et al. 1990)
+#rev_primer_RC="GCATATCAATAAGCGGAGGA" # ITS4 rev compl
 
 #fwd_primer="CTTGGTCATTTAGAGGAAGTAA" # ITS1F fwd primer (White et al. 1990)
 #rev_primer="GCTGCGTTCTTCATCGATGC" # ITS2 rev primer (White et al. 1990)
@@ -95,10 +96,10 @@ rev_primer_RC="GCATATCAATAAGCGGAGGA" # ITS4 rev compl
 #rev_primer="GGTTACCTTGTTACGACTT" # 1492R rev primer (Heuer et al., Environ Microbiol. 1997;63:3233–41)
 #rev_primer_RC="AAGTCGTAACAAGGTAACC" # 1492R rev compl
 
-#fwd_primer="CCTACGGGNGGCWGCAG" # 341F fwd primer (Albersten et al., PLoS ONE. 2015;10:e0132783)
+fwd_primer="CCTACGGGNGGCWGCAG" # 341F fwd primer (Albersten et al., PLoS ONE. 2015;10:e0132783)
 #fwd_primer="CCTACGGGAGGCAGCAG" # 341F fwd primer (Albersten et al., PLoS ONE. 2015;10:e0132783)
-#rev_primer="GGACTACHVGGGTWTCTAAT" # 806R rev primer (Apprill et al., 2015. modified by Caporaso)
-#rev_primer_RC="ATTAGAWACCCBDGTAGTCC" # 806R rev compl
+rev_primer="GGACTACHVGGGTWTCTAAT" # 806R rev primer (Apprill et al., 2015. modified by Caporaso)
+rev_primer_RC="ATTAGAWACCCBDGTAGTCC" # 806R rev compl
 
 #fwd_primer="GGAAGTAAAAGTCGTAACAAGG" #ITS5-1737F Novogene primers for ITS
 #rev_primer="GCTGCGTTCTTCATCGATGC" #ITS2-2043R

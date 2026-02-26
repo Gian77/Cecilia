@@ -106,7 +106,6 @@ Most of the variables are are sefl explanatory, usually boolean, so they take tw
 >* the `$project_dir/outputs/08_testLength_usearch` directory will contain the `testLength.results` file that has the number of filtered reads, uniques, and OTUs numbers at each bp of length, from reads trimmed at 150bp to 300bp. If you do not see OTUs (or very few), do not freak out, it can be that most of reads are shorter than 150bp. Check the `$project_dir/outputs/07_readTrimDemux_usearch/eestats2.results` file if that is your case.
 >* Most importantly all the pipeline results and reports will be saved in a *tar.gz* file in the `$project_dir/outputs/16_getStats-bash/`.
 
-
 #### **PCR primers.**
 Remember to uncomment the primers that were used in your study, and if you have used a different set of primers, just add it to the `config.yaml` file.
 ```
@@ -150,4 +149,3 @@ Please install via conda (or use the binaries in the HPPC) of all these software
 ### **Acknowledgements**
 This pipeline is dedicated to my friend's daugther Cecilia.
 Many thanks to the Institute for Cyber-Enabled Research (ICER) for helping troubshoting SLURM, Research Technology Support Facility (RTSF) [Genomics Core](https://rtsf.natsci.msu.edu/genomics/) at Michigan State University (MSU) for sequencing the data, Dr. Greg Bonito and the whole [Bonito lab](https://www.canr.msu.edu/bonitolab/) at MSU for brainstorming over methods and tools, my good friend and colleague Dr. Livio Antonielli at the [AIT Austrian Institute of Technology GmbH](https://www.ait.ac.at/en/) for always answering my uncountable bioiformatic questions and for giving me a baseline code from where to start this project, and my friends Dr. Kristi MacCready and Dr. Zachary Noel for the million discussion about microbiomes and how to best analyze them.
-

@@ -38,7 +38,7 @@ source ../config.yaml
 output_dir="$project_dir/outputs/02_rawQuality_fqc"
 stats_dir="$project_dir/stats"
 slurm_dir="$project_dir/slurms"
-rawdata_dir="$project_dir/rawdata"
+input_dir="$project_dir/outputs/01_decompressed"
 stats_dir="$project_dir/stats"
 
 echo -e "\n========== Creating necessary directories ==========\n"
@@ -60,7 +60,7 @@ fi
 # -----------------------------------------------------------------------------
 # RUN FASTQC & USEARCH EESTATS2
 # -----------------------------------------------------------------------------
-cd "$rawdata_dir" || { echo "ERROR: Cannot cd into $rawdata_dir"; exit 1; }
+cd "$input_dir" || { echo "ERROR: Cannot cd into $input_dir"; exit 1; }
 
 echo -e "\n========== Read quality assessment with FastQC ==========\n"
 module purge
