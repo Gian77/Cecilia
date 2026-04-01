@@ -48,10 +48,11 @@ echo "Results directory : $cecilia_dir"
 echo -e "\n========== Collecting Cecilia results ==========\n"
 
 # -----------------------------------------------------------------------------
-# COPY CONFIG AND STATs
+# COPY CONFIG, STATs, and NAME MAPPING FILE
 # -----------------------------------------------------------------------------
 cp "$project_dir/config.yaml" "$cecilia_dir/config.yaml"
 cp "$project_dir/stats/*.counts" "$cecilia_dir/"
+cp "$project_dir/outputs/05_readRenamed_bash/file_mapping.txt" "$cecilia_dir/"
 
 # -----------------------------------------------------------------------------
 # COPY FASTQ FILEs
@@ -123,12 +124,9 @@ if compgen -G "$project_dir/outputs/13_taxonomy_sintax*" > /dev/null; then
     found_any=true
 fi
 
-
-
 if [ "$found_any" = false ]; then
     echo "No taxonomy output directories found to copy."
 fi
-
 
 # -----------------------------------------------------------------------------
 # SLURM RUNTIME STATS
