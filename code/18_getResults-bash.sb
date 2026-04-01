@@ -109,11 +109,21 @@ if compgen -G "$project_dir/outputs/12_taxonomy_constax*" > /dev/null; then
     found_any=true
 fi
 
+#if compgen -G "$project_dir/outputs/13_taxonomy_sintax*" > /dev/null; then
+#    echo "Copying SINTAX taxonomy results..."
+#    cp -R "$project_dir/outputs/13_taxonomy_sintax"*/ "$cecilia_dir/"
+#    mv "$cecilia_dir/13_taxonomy_sintax"  "$cecilia_dir/taxonomy_sintax"
+#    rm "$cecilia_dir/taxonomy_sintax/*.udb"
+#    found_any=true
+#fi
+
 if compgen -G "$project_dir/outputs/13_taxonomy_sintax*" > /dev/null; then
     echo "Copying SINTAX taxonomy results..."
-    cp -R "$project_dir/outputs/13_taxonomy_sintax"*/ "$cecilia_dir/"
+    rsync -a --exclude='*.udb' "$project_dir/outputs/13_taxonomy_sintax"/ "$cecilia_dir/taxonomy_sintax"/
     found_any=true
 fi
+
+
 
 if [ "$found_any" = false ]; then
     echo "No taxonomy output directories found to copy."
