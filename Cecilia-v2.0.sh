@@ -155,24 +155,32 @@ fi
 # -----------------------------------------------------------------------------
 echo -e "\n========== Assigning taxonomies ==========\n"
 
-if [[ "$constax_taxonomy" == "yes" ]]; then
-    for jid in "$jid11" "$jid12" "$jid13" "$jid14"; do
-        if [[ -n "$jid" ]]; then
-            jid16=$(sbatch --dependency=afterok:$jid 16_taxonomyConstax.sb | cut -d" " -f 4)
-            echo "$jid16: Assigning taxonomy using CONSTAX2 (after $jid)."
-            break
-        fi
-    done
-elif [[ "$sintax_taxonomy" == "yes" ]]; then
-    for jid in "$jid11" "$jid12" "$jid13" "$jid14"; do
-        if [[ -n "$jid" ]]; then
-            jid17=$(sbatch --dependency=afterok:$jid 17_taxonomySintax.sb | cut -d" " -f 4)
-            echo "$jid17: Assigning taxonomy using USEARCH SINTAX (after $jid)."
-            break
-        fi
-    done
+# Build dependency string
+deps=""
+for jid in "$jid11" "$jid12" "$jid13" "$jid14"; do
+    if [[ -n "$jid" ]]; then
+        deps="${deps:+$deps:}$jid"
+    fi
+done
+
+if [[ -z "$deps" ]]; then
+    echo "No upstream clustering jobs found."
 else
-    echo "No taxonomy assignment selected (CONSTAX2 or SINTAX)."
+
+    if [[ "$constax_taxonomy" == "yes" ]]; then
+        jid16=$(sbatch --dependency=afterok:$deps 16_taxonomyConstax.sb | awk '{print $4}')
+        echo "$jid16: Assigning taxonomy using CONSTAX2 (after $deps)."
+    else
+        echo "No taxonomy CONSTAX assignment selected."
+    fi
+
+    if [[ "$sintax_taxonomy" == "yes" ]]; then
+        jid17=$(sbatch --dependency=afterok:$deps 17_taxonomySintax.sb | awk '{print $4}')
+        echo "$jid17: Assigning taxonomy using USEARCH SINTAX (after $deps)."
+    else
+        echo "No taxonomy SINTAX assignment selected."
+    fi
+
 fi
 
 # -----------------------------------------------------------------------------
