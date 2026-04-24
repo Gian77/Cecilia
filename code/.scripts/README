@@ -1,0 +1,1 @@
+sed -i '/>/!s/U/T/g' SILVA_138.2_SSURef_tax_silva_bact_arch.fasta

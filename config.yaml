@@ -20,8 +20,8 @@ project_dir="/mnt/home/benucci/Cecilia"
 DNAmarker=16S
 primers=yes
 R1=yes
-R2=no
-assemble=no
+R2=yes
+assemble=yes
 min_overlap=0
 rename=yes
 count_start=01
@@ -30,7 +30,7 @@ stripleft_bp=0
 max_Eerr=1.0
 test_length=yes
 user_only=no
-user_length=233
+user_length=290
 cluster_otu=yes
 otu_min_size=1
 closed_ref_otu=yes # if yes must specify database below
@@ -41,7 +41,6 @@ clustering_id=0.97
 cluster_swarm=yes
 constax_taxonomy=yes
 sintax_taxonomy=yes
-# -----------------------------------------------------------------------------
 
 # -----------------------------------------------------------------------------
 # CONASTAX PARAMETERs, PATHs and DATBASEs
@@ -68,7 +67,7 @@ constax_db="/mnt/research/glbrc_group/benuccigmn/DATABASES/SILVA/SILVA_138_SSURe
 # -----------------------------------------------------------------------------
 # DATABASEs (comment not used)
 #sintax_db="/mnt/research/glbrc_group/benuccigmn/projects/project_Workshop16S/16S-Analysis-Playground/pipeline_USEARCH/taxonomy_db/rdp_16s_v16.fa.gz"
-sintax_db="/mnt/research/glbrc_group/benuccigmn/DATABASES/SILVA/SILVA_138_SSURef_tax_silva_bact_arch.fasta"
+sintax_db="/mnt/research/glbrc_group/benuccigmn/DATABASES/SILVA/SILVA_138_SSURef_tax_silva_bact_arch__UTAX.fasta"
 #closedRef_db="/mnt/research/glbrc_group/benuccigmn/DATABASES/CLOSED_REF_DBs/closed_ref_seeds.fasta"
 closedRef_db="/mnt/research/glbrc_group/benuccigmn/DATABASES/CLOSED_REF_DBs/syncom_n40_ref_seeds.fasta"
 
@@ -96,19 +95,18 @@ closedRef_db="/mnt/research/glbrc_group/benuccigmn/DATABASES/CLOSED_REF_DBs/sync
 #rev_primer="GGTTACCTTGTTACGACTT" # 1492R rev primer (Heuer et al., Environ Microbiol. 1997;63:3233–41)
 #rev_primer_RC="AAGTCGTAACAAGGTAACC" # 1492R rev compl
 
-fwd_primer="CCTACGGGNGGCWGCAG" # 341F fwd primer (Albersten et al., PLoS ONE. 2015;10:e0132783)
+#fwd_primer="CCTACGGGNGGCWGCAG" # 341F fwd primer (Albersten et al., PLoS ONE. 2015;10:e0132783)
 #fwd_primer="CCTACGGGAGGCAGCAG" # 341F fwd primer (Albersten et al., PLoS ONE. 2015;10:e0132783)
-rev_primer="GGACTACHVGGGTWTCTAAT" # 806R rev primer (Apprill et al., 2015. modified by Caporaso)
-rev_primer_RC="ATTAGAWACCCBDGTAGTCC" # 806R rev compl
+#rev_primer="GGACTACHVGGGTWTCTAAT" # 806R rev primer (Apprill et al., 2015. modified by Caporaso)
+#rev_primer_RC="ATTAGAWACCCBDGTAGTCC" # 806R rev compl
 
 #fwd_primer="GGAAGTAAAAGTCGTAACAAGG" #ITS5-1737F Novogene primers for ITS
 #rev_primer="GCTGCGTTCTTCATCGATGC" #ITS2-2043R
 #rev_primer_RC="GCATCGATGAAGAACGCAGC" #ITS2-2043R rev comp
 
-#fwd_primer="GTGCCAGCMGCCGCGGTAA" # 515F fwd primer (Parada et al., 2016 modified by Caporaso)
-#rev_primer="GGACTACHVGGGTWTCTAAT" # 806R rev primer (Apprill et al., 2015. modified by Caporaso)
-#rev_primer_RC="ATTAGAWACCCBDGTAGTCC" # 806R rev compl https://earthmicrobiome.org/protocols-and-standards/16s/
-# -----------------------------------------------------------------------------
+fwd_primer="GTGCCAGCMGCCGCGGTAA" # 515F fwd primer (Parada et al., 2016 modified by Caporaso)
+rev_primer="GGACTACHVGGGTWTCTAAT" # 806R rev primer (Apprill et al., 2015. modified by Caporaso)
+rev_primer_RC="ATTAGAWACCCBDGTAGTCC" # 806R rev compl https://earthmicrobiome.org/protocols-and-standards/16s/
 
 #****************************** END OF USER INPUT **************************#
 #===========================================================================#

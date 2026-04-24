@@ -19,6 +19,6 @@ rawdata/*/
 outputs/
 slurms/
 stats/
-scripts/
+scripts/*
 testing/
 code/temp/

@@ -3,10 +3,10 @@
 #SBATCH --time=09:59:00
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
-#SBATCH --cpus-per-task=16
-#SBATCH --mem=64G
+#SBATCH --cpus-per-task=32
+#SBATCH --mem=392G
 #SBATCH --job-name=17_Sintax
-#SBATCH -A glbrc
+#SBATCH -C NOAUTO:vim
 
 set -euo pipefail
 
