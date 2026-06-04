@@ -33,7 +33,7 @@ source ../config.yaml
 # -----------------------------------------------------------------------------
 # SETUP DIRECTORIES
 # -----------------------------------------------------------------------------
-output_dir="$project_dir/outputs/16_getResults_bash"
+output_dir="$project_dir/outputs/14_getResults_bash"
 cecilia_dir="$output_dir/Cecilia-results"
 mkdir -p "$output_dir"
 mkdir -p "$cecilia_dir"
@@ -106,17 +106,10 @@ found_any=false
 
 if compgen -G "$project_dir/outputs/12_taxonomy_constax*" > /dev/null; then
     echo "Copying CONSTAX taxonomy results..."
-    cp -R "$project_dir/outputs/12_taxonomy_constax"*/ "$cecilia_dir/"
+    cp -R "$project_dir/outputs/12_taxonomy_constax"/ "$cecilia_dir/"
+    mv "$cecilia_dir/12_taxonomy_constax"/ "$cecilia_dir/constax_taxonomy"/
     found_any=true
 fi
-
-#if compgen -G "$project_dir/outputs/13_taxonomy_sintax*" > /dev/null; then
-#    echo "Copying SINTAX taxonomy results..."
-#    cp -R "$project_dir/outputs/13_taxonomy_sintax"*/ "$cecilia_dir/"
-#    mv "$cecilia_dir/13_taxonomy_sintax"  "$cecilia_dir/taxonomy_sintax"
-#    rm "$cecilia_dir/taxonomy_sintax/*.udb"
-#    found_any=true
-#fi
 
 if compgen -G "$project_dir/outputs/13_taxonomy_sintax*" > /dev/null; then
     echo "Copying SINTAX taxonomy results..."

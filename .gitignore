@@ -22,3 +22,10 @@ stats/
 scripts/*
 testing/
 code/temp/
+.claude/
+
+# Nextflow runtime artifacts
+work/
+.nextflow/
+.nextflow.log*
+cecilia_nf-*.log

@@ -6,7 +6,7 @@
 #SBATCH --cpus-per-task=32
 #SBATCH --mem=392G
 #SBATCH --job-name=17_Sintax
-#SBATCH -C NOAUTO:vim
+#SBATCH -A glbrc ### minus C NOAUTO:vim
 
 set -euo pipefail
 

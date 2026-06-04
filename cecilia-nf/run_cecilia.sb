@@ -1,0 +1,31 @@
+#!/bin/bash
+#SBATCH --time=24:00:00
+#SBATCH --nodes=1
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=2
+#SBATCH --mem=8G
+#SBATCH --job-name=cecilia_nf
+#SBATCH --output=%x-%j.log
+#SBATCH -A glbrc
+
+# =============================================================================
+# Cecilia-nf  —  SLURM launcher script
+# Runs the Nextflow head process as a SLURM job so it persists for the full
+# pipeline duration (up to 24 h).  Nextflow then submits all child jobs to
+# SLURM from within this job.
+#
+# Usage:
+#   sbatch run_cecilia.sb                          # fresh run
+#   sbatch run_cecilia.sb -resume <session-id>     # resume a previous run
+# =============================================================================
+
+set -euo pipefail
+
+cd /mnt/ffs24/home/benucci/Cecilia
+
+module purge
+module load Miniforge3
+conda activate nextflow
+
+# Pass any extra arguments (e.g. -resume <session_id>) through $@
+nextflow run cecilia-nf/main.nf "$@"

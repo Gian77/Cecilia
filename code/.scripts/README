@@ -1,1 +1,7 @@
+python3 reformat_silva_for_sintax.py /mnt/research/glbrc_group/benuccigmn/DATABASES/SILVA/SILVA_138_SSURef_tax_silva_bact_arch.fasta /mnt/research/glbrc_group/benuccigmn/DATABASES/SILVA/SILVA_138_SSURef_tax_silva_bact_arch_sintax.fasta
+(python3) [benucci@dev-amd20 .scripts]$ grep "^>" /mnt/research/glbrc_group/benuccigmn/DATABASES/SILVA/SILVA_138_SSURef_tax_silva_bact_arch_sintax.fasta | grep -c ","
+2053016
+(python3) [benucci@dev-amd20 .scripts]$ grep "^>" /mnt/research/glbrc_group/benuccigmn/DATABASES/SILVA/SILVA_138_SSURef_tax_silva_bact_arch_sintax.fasta | grep -v "tax=d:" | head -5
+(python3) [benucci@dev-amd20 .scripts]$ 
+
 sed -i '/>/!s/U/T/g' SILVA_138.2_SSURef_tax_silva_bact_arch.fasta

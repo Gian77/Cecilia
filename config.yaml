@@ -67,7 +67,7 @@ constax_db="/mnt/research/glbrc_group/benuccigmn/DATABASES/SILVA/SILVA_138_SSURe
 # -----------------------------------------------------------------------------
 # DATABASEs (comment not used)
 #sintax_db="/mnt/research/glbrc_group/benuccigmn/projects/project_Workshop16S/16S-Analysis-Playground/pipeline_USEARCH/taxonomy_db/rdp_16s_v16.fa.gz"
-sintax_db="/mnt/research/glbrc_group/benuccigmn/DATABASES/SILVA/SILVA_138_SSURef_tax_silva_bact_arch__UTAX.fasta"
+sintax_db="/mnt/research/glbrc_group/benuccigmn/DATABASES/SILVA/SILVA_138_SSURef_tax_silva_bact_arch_sintax.fasta"
 #closedRef_db="/mnt/research/glbrc_group/benuccigmn/DATABASES/CLOSED_REF_DBs/closed_ref_seeds.fasta"
 closedRef_db="/mnt/research/glbrc_group/benuccigmn/DATABASES/CLOSED_REF_DBs/syncom_n40_ref_seeds.fasta"
 
