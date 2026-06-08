@@ -24,19 +24,18 @@ process FASTQC {
     """
     set -euo pipefail
 
+    # Concatenate all samples for this direction into one file before QC
+    cat ${reads.join(' ')} > ${group}_reads.fastq
+
     # Redirect JVM temp I/O to local /tmp to avoid SIGBUS on parallel filesystems
     export _JAVA_OPTIONS="-Djava.io.tmpdir=/tmp -Xss512k"
 
-    fastqc --threads ${task.cpus} --dir /tmp --outdir . ${reads.join(' ')}
+    fastqc --threads ${task.cpus} --dir /tmp --outdir . ${group}_reads.fastq
 
-    for f in ${reads.join(' ')}; do
-        base=\$(basename "\$f" .fastq)
-        ${params.usearch} -fastx_info "\$f" -output "\${base}.info" 2>/dev/null || true
-    done
+    ${params.usearch} -fastx_info ${group}_reads.fastq \
+        -output ${group}_reads.info 2>/dev/null || true
 
-    for f in ${reads.join(' ')}; do
-        count=\$(( \$(wc -l < "\$f") / 4 ))
-        echo "\$(basename \$f) : \$count"
-    done > ${group}.raw.counts
+    count=\$(( \$(wc -l < "${group}_reads.fastq") / 4 ))
+    echo "${group}_reads.fastq : \$count" > ${group}.raw.counts
     """
 }
