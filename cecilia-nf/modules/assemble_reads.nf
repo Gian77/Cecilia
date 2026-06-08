@@ -5,7 +5,6 @@
 process ASSEMBLE_READS {
     tag "${sample_id}"
     publishDir "${params.outdir}/04_readAssembly_usearch", mode: 'copy', pattern: "*.fastq"
-    publishDir "${params.outdir}/stats",                   mode: 'copy', pattern: "*.counts"
 
     input:
     tuple val(sample_id), path(reads)

@@ -60,14 +60,19 @@ workflow CECILIA {
 
     // -------------------------------------------------------------------------
     // STEP 03  —  PhiX removal  (per sample)
+    // Counts are collected across all samples into one summary file in stats/.
     // -------------------------------------------------------------------------
     REMOVE_PHIX(DECOMPRESS.out.reads)
+    REMOVE_PHIX.out.counts
+        .collectFile(name: 'all.nophix.counts', storeDir: "${params.outdir}/stats", newLine: false)
 
     // -------------------------------------------------------------------------
     // STEP 04  —  Paired-read assembly  (optional, per sample)
     // -------------------------------------------------------------------------
     if (params.assemble) {
         ASSEMBLE_READS(REMOVE_PHIX.out.reads)
+        ASSEMBLE_READS.out.counts
+            .collectFile(name: 'all.assembled.counts', storeDir: "${params.outdir}/stats", newLine: false)
         ch_after_assemble = ASSEMBLE_READS.out.reads
     } else {
         ch_after_assemble = REMOVE_PHIX.out.reads

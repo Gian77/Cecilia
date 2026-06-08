@@ -9,7 +9,6 @@
 process REMOVE_PHIX {
     tag "${sample_id}"
     publishDir "${params.outdir}/03_removePhix_usearch", mode: 'copy', pattern: "*.fastq"
-    publishDir "${params.outdir}/stats",                 mode: 'copy', pattern: "*.counts"
 
     input:
     tuple val(sample_id), path(reads)
