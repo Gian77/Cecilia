@@ -21,7 +21,7 @@ process TEST_LENGTH {
     set -euo pipefail
 
     # Rename read headers to @newstring.N for consistent grep-counting
-    sed '1~4s/.*\\./@newstring./g' ${source_fastq} > source_renamed.fastq
+    awk 'NR%4==1{sub(/.*\\./, "@newstring.")} 1' ${source_fastq} > source_renamed.fastq
 
     echo -e "Length\tFiltered\tUniques\tOtus" > testLength.results
 

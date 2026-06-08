@@ -6,6 +6,7 @@
 // =============================================================================
 process POOL_READS {
     publishDir "${params.outdir}/06_primerStrip_cutadapt", mode: 'copy'
+    publishDir "${params.outdir}/stats",                   mode: 'copy', pattern: "pooled.counts"
 
     input:
     path(stripped_fastqs)   // collected list of *_stripped.fastq files
@@ -29,7 +30,7 @@ process POOL_READS {
 
     # Per-sample read counts extracted from pooled.fastq headers
     # Headers look like: @sample001.1 (written by RENAME_READS awk step)
-    sed -n '1~4p' pooled.fastq \\
+    awk 'NR%4==1' pooled.fastq \\
         | sed 's/^@//' \\
         | awk -F'.' '{print \$1}' \\
         | sort | uniq -c \\

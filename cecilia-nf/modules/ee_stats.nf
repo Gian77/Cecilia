@@ -41,7 +41,7 @@ process EE_STATS {
             -length_cutoffs 100,500,1
 
         # Per-sample read counts from trimmed headers (@sample001.N format)
-        sed -n '1~4p' trimmed.fastq \\
+        awk 'NR%4==1' trimmed.fastq \\
             | sed 's/^@//' \\
             | awk -F'.' '{print \$1}' \\
             | sort | uniq -c \\
@@ -61,7 +61,7 @@ process EE_STATS {
             -length_cutoffs 100,500,1
 
         # Per-sample read counts from pooled headers (@sample001.N format)
-        sed -n '1~4p' ${pooled_fastq} \\
+        awk 'NR%4==1' ${pooled_fastq} \\
             | sed 's/^@//' \\
             | awk -F'.' '{print \$1}' \\
             | sort | uniq -c \\

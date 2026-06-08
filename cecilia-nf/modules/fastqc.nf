@@ -1,17 +1,16 @@
 // =============================================================================
-// FASTQC  (step 02, per sample)
-// Runs FastQC on each sample's decompressed read files.
+// FASTQC  (step 02, all samples together)
+// Runs FastQC on all decompressed read files in a single job.
 // Also runs USEARCH -fastx_info per file (binary mounted from host).
 // Parallel branch — does not block the main pipeline DAG.
 // =============================================================================
 process FASTQC {
-    tag "${sample_id}"
-    publishDir "${params.outdir}/02_rawQuality_fqc",          mode: 'copy', pattern: "*.{html,zip}"
+    publishDir "${params.outdir}/02_rawQuality_fqc",            mode: 'copy', pattern: "*.{html,zip}"
     publishDir "${params.outdir}/02_rawQuality_fqc/fastq_info", mode: 'copy', pattern: "*.info"
-    publishDir "${params.outdir}/stats",                        mode: 'copy', pattern: "*.counts"
+    publishDir "${params.outdir}/stats",                         mode: 'copy', pattern: "*.counts"
 
     input:
-    tuple val(sample_id), path(reads)
+    path(reads)   // all decompressed read files collected into one invocation
 
     output:
     path("*.html"),   emit: html
@@ -36,11 +35,10 @@ process FASTQC {
         ${params.usearch} -fastx_info "\$f" -output "\${base}.info" 2>/dev/null || true
     done
 
-    # Raw read count per file
-    counts_file="${sample_id}.raw.counts"
+    # Raw read counts — one line per file, all in a single summary file
     for f in ${reads.join(' ')}; do
         count=\$(( \$(wc -l < "\$f") / 4 ))
-        echo "\$(basename \$f) : \$count" >> "\$counts_file"
-    done
+        echo "\$(basename \$f) : \$count"
+    done > raw.counts
     """
 }

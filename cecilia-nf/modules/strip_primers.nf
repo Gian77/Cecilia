@@ -9,7 +9,6 @@
 process STRIP_PRIMERS {
     tag "${sample_id}"
     publishDir "${params.outdir}/06_primerStrip_cutadapt", mode: 'copy', pattern: "*.fastq"
-    publishDir "${params.outdir}/stats",                   mode: 'copy', pattern: "*.counts"
 
     input:
     tuple val(sample_id), path(fastq)

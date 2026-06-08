@@ -47,7 +47,7 @@ workflow CECILIA {
     // -------------------------------------------------------------------------
     // STEP 02  —  FastQC on raw reads  (parallel branch, does not block DAG)
     // -------------------------------------------------------------------------
-    FASTQC(DECOMPRESS.out.reads)
+    FASTQC(DECOMPRESS.out.reads.flatMap { id, reads -> reads }.collect())
 
     // -------------------------------------------------------------------------
     // STEP 03  —  PhiX removal  (per sample)
