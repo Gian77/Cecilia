@@ -46,8 +46,17 @@ workflow CECILIA {
 
     // -------------------------------------------------------------------------
     // STEP 02  —  FastQC on raw reads  (parallel branch, does not block DAG)
+    // R1 and R2 are analysed independently: one SLURM job per direction,
+    // each receiving all samples for that direction pooled together.
+    // groupTuple() collects all per-sample files sharing the same group key.
     // -------------------------------------------------------------------------
-    FASTQC(DECOMPRESS.out.reads.flatMap { id, reads -> reads }.collect())
+    if (params.paired) {
+        ch_fqc_r1 = DECOMPRESS.out.reads.map { id, reads -> tuple('R1', reads[0]) }.groupTuple()
+        ch_fqc_r2 = DECOMPRESS.out.reads.map { id, reads -> tuple('R2', reads[1]) }.groupTuple()
+        FASTQC(ch_fqc_r1.mix(ch_fqc_r2))
+    } else {
+        FASTQC(DECOMPRESS.out.reads.map { id, reads -> tuple('all', reads[0]) }.groupTuple())
+    }
 
     // -------------------------------------------------------------------------
     // STEP 03  —  PhiX removal  (per sample)
