@@ -1,5 +1,5 @@
 // =============================================================================
-// TEST_LENGTH  (step 08, optional subworkflow — params.test_length = true)
+// TEST_LENGTH  (step 08, optional — params.test_length = true)
 // Sweeps truncation lengths 150–300 bp: filter → derep → cluster_otus at
 // each length, records counts in testLength.results, then plots with R.
 // Requires: USEARCH (bind-mounted), Rscript + tidyverse (from rocker/tidyverse).

@@ -26,6 +26,9 @@ code/temp/
 .claude/
 CLAUDE.md
 
+# Auto-fetched USEARCH binary (public domain, but not ours to redistribute here)
+.tools/
+
 # Nextflow runtime artifacts
 work/
 .nextflow/

@@ -77,13 +77,12 @@ Steps marked `*` are optional and controlled by flags in `nextflow.config`.
 
 ```
 CECILIAv2/
-├── cecilia.nf               # Entry point — prints run summary, calls CECILIA workflow
+├── cecilia.nf               # Entry point and main DAG wiring all modules together
 ├── nextflow.config          # All user parameters, SLURM resources, Singularity config
 ├── run_cecilia.sb           # SLURM launcher for the Nextflow head process
-├── workflows/
-│   ├── cecilia.nf           # Main DAG wiring all modules together
-│   └── test_length.nf       # Optional length-sweep subworkflow
-├── modules/                 # One .nf file per process (18 total)
+├── lib/
+│   └── Utils.groovy         # Shared helpers (param coercion, USEARCH fetch)
+├── modules/                 # One .nf file per process (20 total)
 │   ├── decompress.nf
 │   ├── fastqc.nf
 │   ├── remove_phix.nf
@@ -102,10 +101,12 @@ CECILIAv2/
 │   ├── cluster_swarm.nf
 │   ├── build_sintax_db.nf
 │   ├── taxonomy_sintax.nf
+│   ├── summarize_counts.nf
 │   └── collect_results.nf
 └── bin/                     # Helper scripts auto-added to PATH in every container
     ├── renameSeq.sh
     ├── compareSeqQual.sh
+    ├── summarizeCounts.sh
     └── testLength.R
 ```
 
@@ -117,7 +118,7 @@ CECILIAv2/
 |---|---|
 | Nextflow ≥ 24 | `conda activate nextflow` on the cluster |
 | Singularity / Apptainer | Available on SLURM compute nodes |
-| USEARCH 11 | Proprietary binary, bind-mounted from host (not containerised) |
+| USEARCH 11.0.667 | Public domain (CC0-1.0); downloaded automatically on first run, bind-mounted from host (not containerised). Version is pinned deliberately — v12 was evaluated and rejected, see `nextflow.config` |
 | SLURM | Default executor; `local` and `test` profiles also available |
 
 All other tools (FastQC, Cutadapt, seqtk, SWARM, R/tidyverse) are pulled automatically as Singularity images on first run and cached in `singularity.cacheDir`.
@@ -131,24 +132,84 @@ All other tools (FastQC, Cutadapt, seqtk, SWARM, R/tidyverse) are pulled automat
 #    Expected naming: SAMPLE_R1_001.fastq.gz / SAMPLE_R2_001.fastq.gz
 
 # 2. Edit nextflow.config — update paths that are site-specific:
-#    params.usearch    — path to USEARCH binary
 #    params.sintax_db  — path to SILVA / UNITE FASTA for taxonomy
 #    params.closedRef_db — path to closed-reference FASTA (if used)
+#    USEARCH needs no setup: it is downloaded automatically on first run.
 
-# 3. Submit to SLURM from a development node
+# 3a. Run interactively from a development node (inside tmux)
+cd CECILIAv2
+module purge && module load Miniforge3 && conda activate nextflow
+nextflow run cecilia.nf
+
+# 3b. ...or submit the head process itself to SLURM
 sbatch CECILIAv2/run_cecilia.sb
 
-# 4. Resume a previous run after a failure
+# 4. Resume a previous run after a failure (either form)
+nextflow run cecilia.nf -resume <session-id>
 sbatch CECILIAv2/run_cecilia.sb -resume <session-id>
 ```
 
-The session ID is shown in the Nextflow run log and in `.nextflow/history`.
+The session ID is shown in the Nextflow run log and in `.nextflow/history`. See
+[Configuration](#configuration) for the difference between the two launch modes and
+for passing parameters on the command line.
 
 ---
 
 ## Configuration
 
-All user-facing parameters are in the `params {}` block of `nextflow.config`. Any parameter can be overridden at the command line without editing the file:
+All user-facing parameters are in the `params {}` block of `nextflow.config`. Any parameter can be overridden at the command line without editing the file. The same flags work whether you launch from the terminal or through SLURM.
+
+### Running from the terminal
+
+Run the Nextflow head process interactively on a **development node** — never a login/gateway node. Individual pipeline steps are still submitted to SLURM (`process.executor = 'slurm'` is the default), so the terminal process only orchestrates and stays lightweight:
+
+```bash
+ssh dev-amd20                     # any ICER development node
+cd /path/to/CECILIAv2
+
+module purge
+module load Miniforge3
+conda activate nextflow
+
+nextflow run cecilia.nf \
+  --dna_marker ITS \
+  --fwd_primer CTTGGTCATTTAGAGGAAGTAA \
+  --rev_primer TCCTCCGCTTATTGATATGC \
+  --rev_primer_rc GCATATCAATAAGCGGAGGA \
+  --max_eerr 0.5 \
+  --cluster_swarm false \
+  --sintax_db /path/to/UNITE.fasta
+```
+
+The head process has to stay alive for the entire run, so start it inside `tmux` (or `screen`) — otherwise it is killed the moment your SSH session drops:
+
+```bash
+tmux new -s cecilia
+# ... launch nextflow, then detach with Ctrl-b then d
+tmux attach -t cecilia            # reattach later, from any login node
+```
+
+Print the full parameter list and exit, without launching anything:
+
+```bash
+nextflow run cecilia.nf --help
+```
+
+Useful Nextflow flags (single dash — distinct from pipeline `--params`):
+
+| Flag | Effect |
+|---|---|
+| `-resume` | reuse cached results from the previous run |
+| `-profile local` | run every process on the current node instead of submitting to SLURM |
+| `-profile test` | as `local`, with `test_length` and `cluster_swarm` forced off |
+| `-ansi-log false` | plain scrolling log, better when piping to `tee` or a file |
+| `-with-report` | write an execution report (already enabled by default in `nextflow.config`) |
+
+Note that `local` and `test` also disable Singularity, so every tool (FastQC, Cutadapt, seqtk, SWARM, R) must already be on your `PATH`. They are meant for quick wiring and syntax checks, not for real runs.
+
+### Running as a batch job
+
+For long runs, submit the head process itself to SLURM so it survives disconnection with no `tmux` needed. Parameters are passed straight through to `nextflow run`:
 
 ```bash
 sbatch run_cecilia.sb \
@@ -161,13 +222,16 @@ sbatch run_cecilia.sb \
   --sintax_db /path/to/UNITE.fasta
 ```
 
+Progress goes to `cecilia_nf-<jobid>.log` in the launch directory. The walltime in `run_cecilia.sb` (`--time=03:59:00`) caps the head process, not the individual steps — raise it for large runs.
+
 ### Key parameters
 
 | Parameter | Default | Description |
 |---|---|---|
 | `rawdata` | `../rawdata` | Directory containing input FASTQ files |
 | `outdir` | `../outputs` | Results destination |
-| `usearch` | *(site path)* | USEARCH binary (host path, bind-mounted) |
+| `usearch` | `.tools/usearch11.0.667_i86linux64` | USEARCH binary; auto-downloaded on first run |
+| `usearch_fetch` | `true` | Allow the download; `false` = fail if the binary is absent |
 | `sintax_db` | *(site path)* | FASTA database for SINTAX taxonomy |
 | `closedRef_db` | *(site path)* | FASTA database for closed-reference OTUs |
 | `dna_marker` | `16S` | Label used in output file names |
@@ -176,7 +240,7 @@ sbatch run_cecilia.sb \
 | `rename` | `true` | Rename reads to sequential sample001/002/… |
 | `primers` | `true` | Strip primers with Cutadapt |
 | `stripleft` | `false` | Trim fixed N bp from read left (set `stripleft_bp`) |
-| `test_length` | `false` | Run 150–300 bp length-sweep subworkflow |
+| `test_length` | `false` | Run the 150–300 bp length sweep |
 | `filter_lengths` | `[200, 225, 250]` | Truncation lengths for FILTER_MAXEE |
 | `user_length` | `290` | Extra truncation length |
 | `max_eerr` | `1.0` | Maximum expected errors for USEARCH filter |
@@ -273,7 +337,9 @@ Images are pulled once and cached in `singularity.cacheDir` (see `nextflow.confi
 
 ## Implementation notes
 
-- **USEARCH is not containerised.** It is a proprietary binary bind-mounted from the host filesystem into every Singularity container via `singularity.runOptions`. The path is set in `params.usearch`.
+- **USEARCH is fetched, not containerised.** USEARCH v11.0.667 was donated to the public domain under CC0-1.0 in 2024 ([`rcedgar/usearch_old_binaries`](https://github.com/rcedgar/usearch_old_binaries)), so the pipeline downloads it into `.tools/` on first run and bind-mounts it into every Singularity container via `singularity.runOptions`. Nothing for the user to obtain by hand. The URL is pinned to a commit rather than a branch, and the download is SHA-256 verified before it is moved into place, so an interrupted fetch cannot leave a truncated binary behind. Set `--usearch /path/to/binary` to use a local copy instead — an existing file is never overwritten, and a checksum mismatch there only warns.
+- **The fetch runs in the entry workflow, not in a process.** Every USEARCH module interpolates `${params.usearch}` straight into its script, and Nextflow params cannot be reassigned at runtime — `params.usearch = …` from a workflow body is silently ignored (verified on 26.04.3). The binary therefore has to exist before the first task is submitted, which is what `Utils.ensureUsearch()` guarantees. Passing it through a channel instead would mean rewriting the input block of all fifteen USEARCH modules and invalidating the entire `-resume` cache.
+- **v11, deliberately, not v12.** USEARCH v12 is open source (GPL-3.0) but drops five commands this pipeline needs (`-filter_phix`, `-fastq_eestats2`, `-sortbylength`, `-fastx_getseqs`, `-fastx_info`), and its `-closed_ref` segfaults on input that v11 processes normally. Since v11 is now public domain, v12 offers no licensing advantage either.
 - **RENAME_READS is a collect step.** All assembled FASTQs are gathered before renaming so that sequential `sample001/002/…` numbering is assigned correctly. Outputs are re-parallelised with `.flatten().map()`.
 - **FILTER_MAXEE uses `optional: true`.** If no reads survive filtering at a given length, that length produces no output and is silently skipped — downstream steps do not fail.
 - **SINTAX uses `.combine()`** to fan out taxonomy jobs: one SLURM job per cluster FASTA × one shared `.udb` file built once by BUILD_SINTAX_DB.
