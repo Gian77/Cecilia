@@ -1,0 +1,107 @@
+%%metro title: CECILIA
+%%metro style: seqera
+%%metro file: reads_in | FASTQ
+%%metro file: qc_out | HTML
+%%metro file: sweep_out | PDF
+%%metro file: archive_out | TAR.GZ
+%%metro line: uparse | UPARSE OTUs (--cluster_otu) | #2db572
+%%metro line: unoise | UNOISE3 ASVs (--cluster_asv) | #0570b0
+%%metro line: asv2otu | ASVs clustered into OTUs (--cluster_asv_to_otu) | #17a2a2
+%%metro line: swarm | SWARM OTUs (--cluster_swarm) | #f5a623
+%%metro line: closedref | Closed-reference OTUs (--closed_ref_otu) | #e63946
+%%metro line: qc | Raw read QC | #8d99ae | dashed
+%%metro line: sweep | Truncation-length sweep (--test_length) | #c77dff | dashed
+%%metro grid: reads | 0,0
+%%metro grid: filtering | 1,0
+%%metro grid: readqc | 0,1
+%%metro grid: clustering | 1,1
+%%metro grid: results | 1,2
+%%metro legend: bl
+
+graph LR
+    subgraph reads [Read preparation]
+        %%metro number: 1
+        %%metro exit: right | uparse, unoise, asv2otu, swarm, closedref, sweep
+        %%metro exit: bottom | qc
+        reads_in[ ]
+        decompress[Decompress]
+        phix[PhiX removal]
+        merge[Merge pairs]
+        rename[Rename reads]
+        cutadapt[Cutadapt]
+
+        reads_in -->|uparse,unoise,asv2otu,swarm,closedref,qc,sweep| decompress
+        decompress -->|uparse,unoise,asv2otu,swarm,closedref,sweep| phix
+        phix -->|uparse,unoise,asv2otu,swarm,closedref,sweep| merge
+        merge -->|uparse,unoise,asv2otu,swarm,closedref,sweep| rename
+        rename -->|uparse,unoise,asv2otu,swarm,closedref,sweep| cutadapt
+    end
+
+    subgraph readqc [Raw read QC]
+        %%metro number: 2
+        %%metro entry: top | qc
+        fastqc[FastQC]
+        qc_out[ ]
+
+        fastqc -->|qc| qc_out
+    end
+
+    subgraph filtering [Pooling and filtering]
+        %%metro number: 3
+        %%metro entry: left | uparse, unoise, asv2otu, swarm, closedref, sweep
+        %%metro exit: bottom | uparse, unoise, asv2otu, swarm, closedref
+        pool[Pool reads]
+        eestats[eestats2]
+        sweep_st[Length sweep]
+        sweep_out[ ]
+        filter[Filter maxEE]
+        derep[Dereplicate]
+
+        pool -->|uparse,unoise,asv2otu,swarm,closedref,sweep| eestats
+        eestats -->|sweep| sweep_st
+        sweep_st -->|sweep| sweep_out
+        eestats -->|uparse,unoise,asv2otu,swarm,closedref| filter
+        filter -->|uparse,unoise,asv2otu,swarm,closedref| derep
+    end
+
+    subgraph clustering [Clustering]
+        %%metro number: 4
+        %%metro entry: top | uparse, unoise, asv2otu, swarm, closedref
+        %%metro exit: bottom | uparse, unoise, asv2otu, swarm, closedref
+        uparse_st[UPARSE]
+        unoise_st[UNOISE3]
+        smallmem[cluster_smallmem]
+        swarm_st[SWARM]
+        closed_st[closed_ref]
+
+        unoise_st -->|asv2otu| smallmem
+    end
+
+    subgraph results [Tables and taxonomy]
+        %%metro number: 5
+        %%metro direction: RL
+        %%metro entry: top | uparse, unoise, asv2otu, swarm, closedref
+        otutab[OTU tables]
+        sintax[SINTAX]
+        summary[Summary tables]
+        archive[Results archive]
+        archive_out[ ]
+
+        otutab -->|uparse,unoise,asv2otu,swarm| sintax
+        otutab -->|closedref| summary
+        sintax -->|uparse,unoise,asv2otu,swarm| summary
+        summary -->|uparse,unoise,asv2otu,swarm,closedref| archive
+        archive -->|uparse,unoise,asv2otu,swarm,closedref| archive_out
+    end
+
+    cutadapt -->|uparse,unoise,asv2otu,swarm,closedref,sweep| pool
+    decompress -->|qc| fastqc
+    derep -->|uparse| uparse_st
+    derep -->|unoise,asv2otu| unoise_st
+    derep -->|swarm| swarm_st
+    derep -->|closedref| closed_st
+    uparse_st -->|uparse| otutab
+    unoise_st -->|unoise| otutab
+    smallmem -->|asv2otu| otutab
+    swarm_st -->|swarm| otutab
+    closed_st -->|closedref| otutab

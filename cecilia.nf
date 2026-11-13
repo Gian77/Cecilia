@@ -372,6 +372,7 @@ workflow {
                                  [default: true]
       --rename           BOOL    Rename reads to sequential sample001/002/…
                                  [default: true]
+      --count_start      INT     Number of the first renamed sample  [default: 01]
       --primers          BOOL    Strip primers with Cutadapt
                                  [default: true]
       --stripleft        BOOL    Trim fixed N bp from read 5' end
@@ -401,7 +402,8 @@ workflow {
       --filter_lengths   LIST    Truncation lengths, e.g. [200,225,250]
                                  [default: [200, 225, 250]]
       --user_length      INT     Extra truncation length             [default: 290]
-      --min_overlap      INT     Min overlap for paired assembly     [default: 0]
+      --min_overlap      INT     Min overlap for paired assembly; 0 = USEARCH
+                                 default (16 bp)                     [default: 0]
 
     ── Clustering ───────────────────────────────────────────────────────────────
       --otu_min_size     INT     Min OTU size (UPARSE)               [default: 1]
@@ -433,6 +435,17 @@ workflow {
     ─────────────────────────────────────────────────────────────────────────────
         """.stripIndent()
         exit 0
+    }
+
+    // Unmerged pairs are not supported downstream: renaming would treat R1 and
+    // R2 as two samples, and Cutadapt has no paired mode here. Stop early.
+    if (Utils.asBool(params.paired) && !Utils.asBool(params.assemble)) {
+        error """
+        --paired true needs --assemble true: CECILIA does not process unmerged
+        read pairs. If your pairs do not merge (amplicon longer than about
+        2 x read length - 20 bp), run on R1 only: put only the R1 files in
+        --rawdata and use --paired false.
+        """.stripIndent()
     }
 
     // Put the USEARCH binary in place before any task is submitted. Downloads

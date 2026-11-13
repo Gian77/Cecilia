@@ -35,3 +35,8 @@ work/
 .nextflow.log*
 cecilia_nf-*.log
 test_*.log
+PROGRESS.md
+ROADMAP.md
+__pycache__/
+superseded/
+testdata/

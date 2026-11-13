@@ -1,13 +1,13 @@
 // =============================================================================
 // RENAME_READS  (step 05, optional: params.rename = true)
-// Collects ALL per-sample FASTQs into one job (matching the original behaviour
-// of renameSeq.sh, which assigns sequential numbers across the full dataset).
+// Collects ALL per-sample FASTQs into one job, so sequential numbers are
+// assigned across the full dataset (as the original CECILIA renameSeq.sh did).
 //
 // Input  : all per-sample FASTQs, collected via .map { id,f -> f }.collect()
 // Output : Sample*.fastq files + file_mapping.txt
 //          Downstream channels re-parallelise with .flatten().map{ f->[f.baseName,f] }
 //
-// Note: uses inline awk rather than calling bin/renameSeq.sh so that cp (not mv)
+// Note: uses inline awk rather than a renameSeq.sh helper so that cp (not mv)
 // is used — Nextflow stages inputs as symlinks, which cannot be renamed in-place.
 // =============================================================================
 process RENAME_READS {

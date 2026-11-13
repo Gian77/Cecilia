@@ -43,10 +43,17 @@ process CLUSTER_SWARM {
         swarms_${len}bp.fasta > swarms_${len}bp.tmp
     mv swarms_${len}bp.tmp swarms_${len}bp.fasta
 
-    ${params.usearch} \\
-        -threads ${task.cpus} \\
-        -otutab ${pooled_fastq} \\
-        -zotus swarms_${len}bp.fasta \\
-        -otutabout otutable_SWARM_${len}bp.txt
+    # usearch -otutab segfaults (exit 139) on an empty -zotus FASTA, so write a
+    # header-only table instead, as CLOSED_REF_OTU does.
+    if [[ -s swarms_${len}bp.fasta ]]; then
+        ${params.usearch} \\
+            -threads ${task.cpus} \\
+            -otutab ${pooled_fastq} \\
+            -zotus swarms_${len}bp.fasta \\
+            -otutabout otutable_SWARM_${len}bp.txt
+    else
+        echo "WARNING: SWARM produced no OTUs at ${len} bp" >&2
+        printf '#OTU ID\\n' > otutable_SWARM_${len}bp.txt
+    fi
     """
 }
