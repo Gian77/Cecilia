@@ -28,10 +28,17 @@ process CLUSTER_UPARSE {
         -otus otus_${len}bp.fasta \\
         -uparseout extra/uparse_otus_${len}bp.txt
 
-    ${params.usearch} \\
-        -threads ${task.cpus} \\
-        -otutab ${pooled_fastq} \\
-        -otus otus_${len}bp.fasta \\
-        -otutabout otutable_UPARSE_${len}bp.txt
+    # usearch -otutab segfaults (exit 139) on an empty -otus FASTA, so write a
+    # header-only table instead, as CLOSED_REF_OTU does.
+    if [[ -s otus_${len}bp.fasta ]]; then
+        ${params.usearch} \\
+            -threads ${task.cpus} \\
+            -otutab ${pooled_fastq} \\
+            -otus otus_${len}bp.fasta \\
+            -otutabout otutable_UPARSE_${len}bp.txt
+    else
+        echo "WARNING: UPARSE produced no OTUs at ${len} bp" >&2
+        printf '#OTU ID\\n' > otutable_UPARSE_${len}bp.txt
+    fi
     """
 }

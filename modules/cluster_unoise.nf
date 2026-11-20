@@ -32,10 +32,17 @@ process CLUSTER_UNOISE {
         asv_${len}bp.fasta > asv_${len}bp.tmp
     mv asv_${len}bp.tmp asv_${len}bp.fasta
 
-    ${params.usearch} \\
-        -threads ${task.cpus} \\
-        -otutab ${pooled_fastq} \\
-        -zotus asv_${len}bp.fasta \\
-        -otutabout asvtable_UNOISE_${len}bp.txt
+    # usearch -otutab segfaults (exit 139) on an empty -zotus FASTA, so write a
+    # header-only table instead, as CLOSED_REF_OTU does.
+    if [[ -s asv_${len}bp.fasta ]]; then
+        ${params.usearch} \\
+            -threads ${task.cpus} \\
+            -otutab ${pooled_fastq} \\
+            -zotus asv_${len}bp.fasta \\
+            -otutabout asvtable_UNOISE_${len}bp.txt
+    else
+        echo "WARNING: UNOISE3 produced no ASVs at ${len} bp" >&2
+        printf '#OTU ID\\n' > asvtable_UNOISE_${len}bp.txt
+    fi
     """
 }

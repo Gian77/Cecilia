@@ -5,7 +5,11 @@
 // The .udb is shared across all TAXONOMY_SINTAX process calls via .combine().
 // =============================================================================
 process BUILD_SINTAX_DB {
-    publishDir "${params.outdir}/13_taxonomy_sintax", mode: 'copy'
+    // Deliberately NOT published. The .udb is a derived index, not a result:
+    // for SILVA 138 it is ~13 GB, and `mode: 'copy'` duplicated it into every
+    // run's outdir (13 of the 15 GB in a test run's outputs/). Nextflow keeps
+    // it in work/ for downstream tasks and for -resume, and it rebuilds from
+    // params.sintax_db in minutes. Publishing it only burns $HOME quota.
 
     input:
     path(sintax_fasta)

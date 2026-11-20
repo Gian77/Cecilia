@@ -26,9 +26,17 @@ code/temp/
 .claude/
 CLAUDE.md
 
+# Auto-fetched USEARCH binary (public domain, but not ours to redistribute here)
+.tools/
+
 # Nextflow runtime artifacts
 work/
 .nextflow/
 .nextflow.log*
 cecilia_nf-*.log
 test_*.log
+PROGRESS.md
+ROADMAP.md
+__pycache__/
+superseded/
+testdata/

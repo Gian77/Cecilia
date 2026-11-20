@@ -19,12 +19,18 @@ process TAXONOMY_SINTAX {
     """
     set -euo pipefail
 
-    ${params.usearch} \\
-        -sintax ${cluster_fasta} \\
-        -db ${sintax_udb} \\
-        -tabbedout ${cluster_fasta.baseName}.sintax \\
-        -strand both \\
-        -sintax_cutoff ${params.sintax_cutoff} \\
-        -threads ${task.cpus}
+    # An empty OTU/ASV set has nothing to classify: write an empty result.
+    if [[ -s ${cluster_fasta} ]]; then
+        ${params.usearch} \\
+            -sintax ${cluster_fasta} \\
+            -db ${sintax_udb} \\
+            -tabbedout ${cluster_fasta.baseName}.sintax \\
+            -strand both \\
+            -sintax_cutoff ${params.sintax_cutoff} \\
+            -threads ${task.cpus}
+    else
+        echo "WARNING: ${cluster_fasta} is empty; nothing to classify" >&2
+        : > ${cluster_fasta.baseName}.sintax
+    fi
     """
 }
